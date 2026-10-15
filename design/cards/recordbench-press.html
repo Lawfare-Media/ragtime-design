@@ -1,0 +1,362 @@
+<!-- @dsCard group="Recordbench" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recordbench — the Press (plates at rest, fixture snapshot)</title>
+<style>
+  :root{
+    /* family tokens (ragtime-design v0.2.1) */
+    --rt-accent:#006a72;--rt-ink:#1d2125;--rt-ink-soft:#4a4f55;--rt-ink-faint:#767a7f;--rt-rule:#d8d4cb;--rt-paper:#f5f3ee;--rt-raised:#fbfaf7;--rt-press:#e8e1cf;
+    --rt-font-ui:Inter,ui-sans-serif,system-ui,sans-serif;--rt-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --rt-font-didot:Didot,'Bodoni 72','Bodoni MT','Playfair Display',serif;--rt-font-iowan:'Iowan Old Style',Charter,Georgia,serif;
+    /* motion, as shipped */
+    --motion-state:220ms;--motion-settle:900ms;--motion-ease-standard:cubic-bezier(0.2,0,0,1);
+    /* press tokens, as shipped in Recordbench app.css after the decision #250 cut */
+    --press-paper:var(--rt-press);--press-paper-edge:#d9d0b8;--press-ink:#15130f;--press-ink-2:#4b4639;--press-plate:var(--rt-accent);--press-hair:#15130f47;
+    --press-c-doc:21,19,15;--press-c-pass:21,19,15;--press-c-claim:0,106,114;--press-c-edge:21,19,15;--press-c-trace:0,106,114;
+    --press-edge-gain:1.9;--press-node-gain:1.3;
+  }
+  .dark{
+    --rt-accent:#6cc0bf;--rt-press:#131416;--press-paper:var(--rt-press);--press-plate:var(--rt-accent);
+    --press-paper-edge:#0c0d0e;--press-ink:#ece4d0;--press-ink-2:#b6af9c;--press-hair:#ece4d042;
+    --press-c-doc:150,146,132;--press-c-pass:190,184,166;--press-c-claim:108,192,191;--press-c-edge:160,155,140;--press-c-trace:108,192,191;
+    --press-edge-gain:1.15;--press-node-gain:1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--rt-paper);color:var(--rt-ink);font:14px/1.5 var(--rt-font-ui)}
+  a{color:var(--rt-accent)}.back-ix{display:inline-block;font-size:12px;margin-bottom:14px}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede0{color:var(--rt-ink-soft);font-size:12.5px;margin:0 0 18px;max-width:86ch}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--rt-ink-faint);font-weight:650;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rt-rule)}
+  code{font:12px var(--rt-font-mono)}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--rt-accent);color:var(--rt-accent);border-radius:3px;margin-left:6px;vertical-align:2px}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:start}
+
+  /* ---------- the screen (Press.svelte) ---------- */
+  .screen{border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin:0 auto;transition:max-width .2s}
+  .screen.phone{max-width:390px}
+  .press{color:var(--press-ink);font-family:var(--rt-font-iowan);-webkit-font-smoothing:antialiased;background:var(--press-paper)}
+  .mast .title{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:'word lede shell';gap:40px;align-items:end;padding:22px 24px 18px;border-bottom:4px double var(--press-ink)}
+  .mast h3{grid-area:word;margin:0;font:700 44px/.8 var(--rt-font-didot);letter-spacing:-.045em;white-space:nowrap;text-shadow:1.6px 1px 0 var(--press-plate)}
+  .mast p{grid-area:lede;margin:0;font:13px/1.4 var(--rt-font-iowan)}.mast p>*+*{margin-left:.4em;color:var(--press-ink-2)}
+  .mast p a{color:var(--press-ink-2);text-decoration:none}
+  .cluster{grid-area:shell;display:flex;align-items:center;gap:14px;margin-bottom:2px}
+  .ico{width:30px;height:30px;display:grid;place-items:center;color:var(--press-ink-2);position:relative}
+  .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .ico.bot{color:var(--press-plate)}.ico.bot b{position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#1f6b45;border:2px solid var(--press-paper)}
+  .av{width:30px;height:30px;border-radius:50%;background:var(--press-ink);color:var(--press-paper);font:600 11px/30px var(--rt-font-ui);text-align:center}
+
+  .plates{margin:0 auto;padding:0 24px;max-width:1080px;list-style:none}
+  .inv{display:grid;grid-template-columns:84px minmax(0,1fr);column-gap:16px;padding:28px 0 30px;border-bottom:1px solid var(--press-hair)}
+  .num{padding-top:2px;font:700 60px/.8 var(--rt-font-didot);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px var(--press-plate);user-select:none;transition:color var(--motion-state) var(--motion-ease-standard)}
+  .inv:hover .num,.inv:focus-within .num{color:var(--press-plate)}
+  .body{display:grid;gap:8px;min-width:0}
+  .press .ttl{margin:0;padding:0;border:0;text-transform:none;color:inherit;font:700 28px/1.06 var(--rt-font-didot);letter-spacing:-.015em}
+  .ttl a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}.ttl a:hover{border-bottom-color:var(--press-plate)}
+  .q{margin:0;max-width:62ch;font:16px/1.45 var(--rt-font-iowan)}
+  .plate{position:relative;width:100%;max-width:46rem;margin:6px 0 2px;border:1px solid var(--press-hair);background:var(--press-paper);cursor:pointer}
+  .plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .tip{position:absolute;left:0;top:0;z-index:2;max-width:22rem;padding:5px 9px;font:13px var(--rt-font-iowan);color:var(--press-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;background:var(--press-paper);border:1px solid var(--press-ink);box-shadow:3px 4px 0 -1px var(--press-hair);transition:opacity var(--motion-state) var(--motion-ease-standard)}
+  .plate.hot .tip{opacity:1}
+  .tip b{font:400 10.5px var(--rt-font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--press-plate)}
+  .cnt{margin:0;font:12.5px/1.5 var(--rt-font-mono);color:var(--press-ink-2)}
+  .pages{font:14px/1.5 var(--rt-font-iowan);display:flex;flex-wrap:wrap;gap:4px 18px}
+  .pages a{color:var(--press-ink);text-decoration:none;border-bottom:1px solid var(--press-hair)}
+  .reads{font:13.5px/1.5 var(--rt-font-iowan);color:var(--press-ink-2)}
+  .reads span{display:block;font:400 10.5px var(--rt-font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--press-ink-2);margin:2px 0}
+  .reads a{color:var(--press-ink);text-decoration:none;margin-right:16px}
+  .way-item{display:inline-flex;flex-direction:column;gap:3px;width:33%;padding:18px 22px 24px 0;vertical-align:top}
+  .way-item a{font:14px var(--rt-font-iowan);color:var(--press-ink-2);text-decoration:none}
+  .way-item span{font:12.5px/1.4 var(--rt-font-iowan);color:var(--press-ink-2)}
+
+  /* phone (≤640px in the app): the same page, tighter */
+  .phone .mast .title{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'word shell' 'lede lede';gap:4px;padding:16px 14px 14px}
+  .phone .mast h3{font-size:36px}.phone .mast p{font-size:12px}.phone .mast p>:nth-child(n+2){display:none}
+  .phone .cluster .ico{display:none}
+  .phone .plates{padding:0 14px}
+  .phone .inv{grid-template-columns:40px minmax(0,1fr);column-gap:10px;padding:18px 0 20px}
+  .phone .num{font-size:30px}.phone .press .ttl,.press.phone .ttl{font-size:21px}.phone .q{font-size:14.5px}
+  .phone .way-item{width:100%;padding:12px 0 6px}
+
+  /* ---------- knobs ---------- */
+  .knobs{position:sticky;top:16px;background:var(--rt-raised);border:1px solid var(--rt-rule);border-radius:3px;padding:12px 14px;font-size:12px}
+  .knobs h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--rt-ink-faint)}
+  .knobs label{display:grid;grid-template-columns:1fr 46px;gap:2px 8px;align-items:center;margin:0 0 9px;color:var(--rt-ink-soft)}
+  .knobs label input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--rt-accent)}
+  .knobs output{font:11px var(--rt-font-mono);text-align:right;color:var(--rt-ink)}
+  .knobs .row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+  .knobs button{font:500 12px var(--rt-font-ui);padding:4px 9px;border:1px solid var(--rt-rule);background:var(--rt-paper);color:var(--rt-ink);border-radius:3px;cursor:pointer}
+  .knobs button.on{background:var(--rt-ink);color:var(--rt-paper);border-color:var(--rt-ink)}
+  .knobs hr{border:0;border-top:1px solid var(--rt-rule);margin:10px 0}
+  textarea{width:100%;height:220px;font:11px/1.4 var(--rt-font-mono);border:1px solid var(--rt-rule);background:var(--rt-raised);padding:8px;border-radius:3px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--rt-ink-soft);margin:10px 0 0}
+  .legend i{display:inline-block;vertical-align:middle;margin-right:6px}
+  .notes{font-size:12.5px;color:var(--rt-ink-soft);max-width:86ch}.notes li{margin:3px 0}
+</style></head>
+<body>
+<a class="back-ix" href="../index.html">← Index</a>
+<h1>Recordbench — the Press <span class="tag">live · fixture snapshot</span></h1>
+<p class="lede0">The front page after the decision #250 cut (<code>Press.svelte</code> + <code>PressPlate.svelte</code> + <code>lib/press.ts</code>), re-implemented on plain canvases so it can be iterated in Claude Design. The Press is now a normal page: the masthead, then one investigation after another in the document's flow, each with a <b>plate</b> drawn at rest. A plate has no camera, no pan, no zoom, no dive and no open state; its box is the field's own aspect ratio, so the page never moves when it paints. On a plate, <b>documents</b> are bars on the left, <b>passages</b> are dots, <b>claims</b> are rings on the right, and curves join a document through its passages to the claims they support. A claim built on another claim loops out to the right. The field layout is the shipped <code>buildField</code>, verbatim. Hover a point to trace its chain. The draw-in plays once a session per plate (here: <b>Replay draw-in</b>). The descent into an investigation is the page change itself: the plate is named for the router's cross-fade and grows into the overview's header. Investigation names come from <code>fixtures.json</code>.</p>
+
+<div class="wrap">
+<div>
+  <div class="screen" id="screen"><div class="press" id="press">
+    <header class="mast"><div class="title">
+      <h3>recordbench</h3>
+      <p><span>Recordbench keeps the record of an investigation. It keeps every source, quoted passage, claim, and review, and it says who did what and when.</span><a href="#">Read what this tool is, and what the record promises.</a><span id="holds"></span></p>
+      <div class="cluster"><div class="ico bot" title="Agent connected"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></div><div class="ico" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div><div class="av">TK</div></div>
+    </div></header>
+    <ol class="plates" id="plates"></ol>
+  </div></div>
+  <div class="legend">
+    <span><i style="width:22px;height:3px;border-radius:2px;background:#15130f"></i>Document (bar length ∝ √ text length)</span>
+    <span><i style="width:5px;height:5px;border-radius:50%;background:#15130f"></i>Passage</span>
+    <span><i style="width:9px;height:9px;border-radius:50%;border:1.2px solid #006a72;background:#006a7259"></i>Claim</span>
+    <span><i style="width:22px;height:0;border-top:1.4px solid #006a72"></i>Traced chain (hover)</span>
+  </div>
+</div>
+
+<aside class="knobs" id="knobs">
+  <h4>Scheme</h4>
+  <div class="row"><button data-scheme="light" class="on">Light</button><button data-scheme="dark">Dark</button></div>
+  <h4>Width</h4>
+  <div class="row"><button data-width="desk" class="on">Desktop</button><button data-width="phone">Phone</button></div>
+  <hr>
+  <h4>Ink</h4>
+  <label>Edge gain <output></output><input type="range" data-k="edgeGain" min="0" max="4" step=".05"></label>
+  <label>Node gain <output></output><input type="range" data-k="nodeGain" min="0" max="3" step=".05"></label>
+  <label>Point size <output></output><input type="range" data-k="size" min=".4" max="2.5" step=".05"></label>
+  <label>Claim colour <output></output><input type="color" data-k="claimHex" style="grid-column:1/-1;width:100%;height:24px;border:0;padding:0;background:none"></label>
+  <hr>
+  <h4>Motion</h4>
+  <label>Draw-in (s) <output></output><input type="range" data-k="arrival" min="0" max="5" step=".05"></label>
+  <hr>
+  <h4>Sampling</h4>
+  <label>Record size × <output></output><input type="range" data-k="scale" min=".1" max="6" step=".1"></label>
+  <label style="grid-template-columns:1fr auto"><span>Register marks</span><input type="checkbox" data-k="marks"></label>
+  <div class="row"><button id="replay">Replay draw-in</button><button id="reset">Reset knobs</button></div>
+</aside>
+</div>
+
+<h2>The snapshot</h2>
+<p class="notes">Five fixture investigations. Each entry gives the plate's words, the readings listed under it and the record's totals; <code>constellation</code> is either generated from <code>seed</code> and <code>shape</code> (below) or given literally in the API's shape (<code>documents[{name,length,marks_total,marks[{start,claims[]}]}]</code>, <code>claims[{name,rests_on[]}]</code>, <code>totals</code>). Paste a literal constellation into any entry to see real shape. Edit, then <b>Apply</b>.</p>
+<textarea id="snap"></textarea>
+<div class="row" style="margin-top:8px;display:flex;gap:8px"><button id="apply" style="font:500 12px var(--rt-font-ui);padding:5px 12px;border:1px solid var(--rt-accent);background:var(--rt-accent);color:#fff;border-radius:3px;cursor:pointer">Apply snapshot</button><span id="snaperr" style="color:#a3231f;font-size:12px"></span></div>
+
+<h2>What was cut (decision #250)</h2>
+<ul class="notes">
+  <li><b>The single field.</b> One canvas holding every investigation, with a camera, a dive into one field, a Back strip, the focus lens, the light pool and the arrival over the masthead. Each investigation now draws its own plate in the page's flow.</li>
+  <li><b>Tokens gone from <code>app.css</code>:</b> <code>--press-ink-3</code>, <code>--press-shade</code>, <code>--press-plate-bg</code>, <code>--press-plate-clear</code>, <code>--press-toner-solid</code>, <code>--press-c-lit</code>, <code>--press-pool</code>, <code>--press-pool-a</code>, <code>--press-grain-tint</code>, <code>--press-grain-amp</code>, <code>--press-night</code>, the <code>@property</code> axes <code>--press-k/-p/-arr/-cen</code>, and <code>--motion-live</code>.</li>
+  <li><b>The other bench designs.</b> Cards, Desk and Cabinet, the dev-only design switch and every <code>--desk-*</code> token. Press is the only front page.</li>
+  <li><b>On the bench root:</b> the find bar, the per-row hues, the PlateArt cards and the Plates dials in settings.</li>
+</ul>
+
+<h2>What to iterate on</h2>
+<ul class="notes">
+  <li><b>Plate type.</b> Didot titles at 28px (21px on a phone) and outlined numerals that fill on hover or focus. The plate's words sit outside the canvas now, so the title no longer carries the misregistered shadow; only the masthead does.</li>
+  <li><b>Ink balance.</b> Shipped gains are 1.9 (edges) and 1.3 (nodes) in light, 1.15 and 1 in dark. At rest every edge is drawn at 0.2 alpha × gain; a traced chain dims the rest to 0.55. Claims are the one coloured mark.</li>
+  <li><b>Draw-in.</b> Once a session per plate, over <code>--motion-settle</code> × 2.5 (2.25s), eased by <code>--motion-ease-standard</code>. None at a motion dial of zero.</li>
+  <li><b>Phone.</b> Same page, narrower: the plate stays, the lede drops to its first sentence, the numeral column shrinks to 40px, and the agent and gear move to the dock. Hover tracing is off for touch.</li>
+</ul>
+
+<script type="application/json" id="snapshot-default">
+[
+  {"investigation":"Agency rule changes","lead":"Which rules changed without notice and comment, and what did the agencies say about why?","readings":["What changed, and when","The reasons the agencies gave"],"totals":{"documents":214,"marks":620,"claims":61},"seed":"agency","shape":{"restsOn":0.25,"skew":1.4}},
+  {"investigation":"Grant terminations","lead":"Which grants were ended, by whom, and on what stated ground?","readings":["Letters sent the same week"],"totals":{"documents":82,"marks":240,"claims":19},"seed":"grants","shape":{"restsOn":0.15,"skew":1.0}},
+  {"investigation":"Court filings review","lead":"What do the filings say the government did, and what did the court find?","readings":[],"totals":{"documents":40,"marks":180,"claims":12},"seed":"court","shape":{"restsOn":0.35,"skew":2.2}},
+  {"investigation":"Public statements","lead":"What did officials say in public, and does the record bear it out?","readings":[],"totals":{"documents":33,"marks":64,"claims":0},"seed":"statements","shape":{"restsOn":0,"skew":0.8}},
+  {"investigation":"Sanctions designations","lead":"Which designations rest on public evidence, and which on none?","readings":["Designations with no public evidence"],"totals":{"documents":120,"marks":410,"claims":38},"seed":"sanctions","shape":{"restsOn":0.2,"skew":1.6}}
+]
+</script>
+
+<script>
+(() => {
+// ---------------- lib/press.ts, verbatim in substance ----------------
+const FIELD = { w: 600, h: 214 }; const DOC = 0, PASSAGE = 1, CLAIM = 2;
+const figure = (n) => n.toLocaleString('en-US');
+function caps(t) { return { docs: Math.round(4 + Math.sqrt(t.documents) * 0.75), passages: Math.round(6 + Math.sqrt(t.marks) * 1.9), claims: Math.round(3 + Math.sqrt(t.claims) * 1.3) }; }
+function rng(seed) { let s = seed | 0; return () => { s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function hash(text) { let h = 2166136261; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619); return h | 0; }
+function buildField(con, seed) {
+  if (!con || con.documents.length === 0) return { points: [], edges: [], adj: [] };
+  const r = rng(hash(seed)); const cap = caps(con.totals); const GW = FIELD.w, GH = FIELD.h;
+  const docOrder = con.documents.map((doc, index) => ({ doc, index })).sort((a, b) => b.doc.marks_total - a.doc.marks_total || a.index - b.index).slice(0, cap.docs).sort((a, b) => a.index - b.index);
+  const nD = docOrder.length; const quota = Math.max(1, Math.ceil(cap.passages / nD));
+  const points = [], edges = [];
+  const make = (type, x, y, extra) => { points.push({ type, x, y, d: 0.55 + r() * 0.95, len: 0, name: '', at: 0, of: 0, dly: 0.3 * r(), sx: GW / 2 + (r() - 0.5) * 1100, sy: GH / 2 + (r() - 0.5) * 700, ...extra }); return points.length - 1; };
+  const longest = Math.max(1, ...docOrder.map(({ doc }) => doc.length ?? doc.marks_total * 400));
+  const docAt = [];
+  docOrder.forEach(({ doc }, i) => { const size = doc.length ?? doc.marks_total * 400; const len = 10 + 30 * Math.sqrt(size / longest); docAt.push(make(DOC, 6 + r() * 14, 10 + ((GH - 20) * (i + 0.5)) / nD, { len, name: doc.name })); });
+  const chosen = [];
+  docOrder.forEach(({ doc }, di) => { doc.marks.map((mark, rank) => ({ mark, rank })).sort((a, b) => b.mark.claims.length - a.mark.claims.length || a.rank - b.rank).slice(0, quota).sort((a, b) => a.rank - b.rank).forEach(({ rank }) => chosen.push({ doc: di, mark: rank, rank })); });
+  const picked = chosen.slice(0, Math.max(cap.passages, nD));
+  const claimIdx = new Map(); const wanted = [];
+  for (const { doc, mark } of picked) for (const c of docOrder[doc].doc.marks[mark].claims) if (!wanted.includes(c) && wanted.length < cap.claims) wanted.push(c);
+  const passages = [];
+  for (const { doc, mark, rank } of picked) {
+    const owner = docOrder[doc].doc; const m = owner.marks[mark];
+    const span = owner.length && owner.length > 0 ? m.start / owner.length : r();
+    const dy = points[docAt[doc]].y;
+    const index = make(PASSAGE, 150 + Math.min(1, Math.max(0, span)) * 300 + r() * 70, Math.min(GH - 6, Math.max(6, dy + (r() - 0.5) * 70)), { name: owner.name, at: rank + 1, of: Math.max(owner.marks_total, rank + 1) });
+    edges.push({ a: docAt[doc], b: index, rest: false });
+    passages.push({ index, doc, claims: m.claims.filter((c) => wanted.includes(c)) });
+  }
+  const meanY = (c) => { const ys = passages.filter((p) => p.claims.includes(c)).map((p) => points[p.index].y); return ys.length === 0 ? GH / 2 : ys.reduce((s, y) => s + y, 0) / ys.length; };
+  const ordered = [...wanted].sort((a, b) => meanY(a) - meanY(b));
+  ordered.forEach((c, i) => claimIdx.set(c, make(CLAIM, 520 + r() * 74, 8 + ((GH - 16) * (i + 0.5)) / ordered.length, { name: con.claims[c].name })));
+  for (const p of passages) for (const c of p.claims) edges.push({ a: p.index, b: claimIdx.get(c), rest: false });
+  for (const c of ordered) for (const from of con.claims[c].rests_on ?? []) { const a = claimIdx.get(from), b = claimIdx.get(c); if (a !== undefined && b !== undefined && a !== b) edges.push({ a, b, rest: true }); }
+  const adj = points.map(() => []); for (const { a, b } of edges) { adj[a].push(b); adj[b].push(a); }
+  return { points, edges, adj };
+}
+function chainOf(f, i) { const set = new Set([i]); const type = f.points[i].type; for (const a of f.adj[i]) { set.add(a); if (type === PASSAGE) continue; for (const b of f.adj[a]) { const t = f.points[b].type; if (type === DOC ? t === CLAIM : t === DOC) set.add(b); } } return set; }
+
+// ---------------- fake constellations ----------------
+const DOC_WORDS = ['Notice of proposed rule', 'Final rule', 'Interim final rule', 'Agency memorandum', 'Press release', 'Termination letter', 'Complaint', 'Motion to dismiss', 'Declaration', 'Order', 'Transcript', 'Guidance document', 'Federal Register notice', 'Inspector general report', 'Letter to Congress'];
+const CLAIM_WORDS = ['The change took effect before any notice', 'The stated ground was not in the statute', 'No comment period was offered', 'The agency later withdrew the reason it gave', 'The decision predates the memo that justifies it', 'Two offices gave different reasons', 'The court found the record incomplete', 'The same text appears in three letters', 'The action reversed a prior written position', 'Funds were obligated before the decision', 'The official named no legal authority', 'The record holds no analysis of cost'];
+function fakeConstellation(entry, scale) {
+  const r = rng(hash(entry.seed || entry.investigation)); const sh = entry.shape || {};
+  const T = { documents: Math.max(1, Math.round(entry.totals.documents * scale)), marks: Math.round(entry.totals.marks * scale), claims: Math.round(entry.totals.claims * scale) };
+  const nDocs = Math.min(T.documents, 80), nClaims = Math.min(T.claims, 60);
+  const claims = []; for (let i = 0; i < nClaims; i++) claims.push({ name: CLAIM_WORDS[i % CLAIM_WORDS.length] + (i >= CLAIM_WORDS.length ? ` (${Math.floor(i / CLAIM_WORDS.length) + 1})` : ''), rests_on: [] });
+  for (let i = 1; i < nClaims; i++) if (r() < (sh.restsOn ?? 0.2)) claims[i].rests_on.push(Math.floor(r() * i));
+  const per = T.marks / nDocs; const docs = [];
+  for (let i = 0; i < nDocs; i++) {
+    const weight = Math.pow(r(), sh.skew ?? 1.2) * 2; const n = Math.max(0, Math.round(per * weight)); const length = Math.round(2000 + r() * 60000 * (0.3 + weight));
+    const marks = []; for (let j = 0; j < Math.min(n, 30); j++) { const c = []; if (nClaims && r() < 0.55) c.push(Math.floor(Math.pow(r(), 1.3) * nClaims)); if (nClaims && r() < 0.12) c.push(Math.floor(r() * nClaims)); marks.push({ start: Math.round(r() * length), claims: [...new Set(c)] }); }
+    marks.sort((a, b) => a.start - b.start);
+    docs.push({ name: `${DOC_WORDS[Math.floor(r() * DOC_WORDS.length)]}, ${2024 + Math.floor(r() * 2)}-${String(1 + Math.floor(r() * 9000)).padStart(4, '0')}`, length, marks_total: n, marks });
+  }
+  return { documents: docs, claims, totals: { ...T, without_text: 0 } };
+}
+
+// ---------------- one plate (PressPlate.svelte) ----------------
+const PAD = 14, BOX_W = FIELD.w + PAD * 2, BOX_H = FIELD.h + PAD * 2;
+const DEFAULTS = { edgeGain: null, nodeGain: null, size: 1, claimHex: null, arrival: 2.25, scale: 1, marks: true };
+let K = { ...DEFAULTS };
+const press = document.getElementById('press'), list = document.getElementById('plates');
+const tok = (n) => getComputedStyle(press).getPropertyValue(n).trim();
+const trip = (n) => tok(n).split(',').map(Number);
+const hexTrip = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ink = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a).toFixed(3)})`;
+function curve(text) {
+  const m = /cubic-bezier\(([^)]+)\)/.exec(text); const p = m ? m[1].split(',').map(Number) : [];
+  if (p.length !== 4) return (x) => x; const [x1, y1, x2, y2] = p;
+  const at = (t, a, b) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+  return (x) => { let lo = 0, hi = 1; for (let i = 0; i < 20; i++) { const mid = (lo + hi) / 2; if (at(mid, x1, x2) < x) lo = mid; else hi = mid; } return at((lo + hi) / 2, y1, y2); };
+}
+let C = {}, ease = (x) => x;
+function readTokens() {
+  C = { doc: trip('--press-c-doc'), pass: trip('--press-c-pass'), claim: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-claim'), edge: trip('--press-c-edge'), trace: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-trace'), eg: K.edgeGain ?? parseFloat(tok('--press-edge-gain')), ng: K.nodeGain ?? parseFloat(tok('--press-node-gain')) };
+  ease = curve(tok('--motion-ease-standard'));
+}
+
+function makePlate(field) {
+  const box = document.createElement('div'); box.className = 'plate'; box.style.aspectRatio = `${BOX_W} / ${BOX_H}`; box.setAttribute('aria-hidden', 'true');
+  box.innerHTML = '<canvas></canvas><div class="tip"><b></b><span></span></div>';
+  const cv = box.querySelector('canvas'), tipEl = box.querySelector('.tip');
+  const P = { field, box, W: 0, H: 0, dpr: 1, hot: -1, chain: null, arrive: 1, t0: 0, raf: 0 };
+  const sx = (x) => ((x + PAD) / BOX_W) * P.W, sy = (y) => ((y + PAD) / BOX_H) * P.H;
+  const place = (i) => { const n = field.points[i]; const e = P.arrive >= 1 ? 1 : ease(clamp((P.arrive - n.dly) / 0.7)); return [sx(n.sx + (n.x - n.sx) * e), sy(n.sy + (n.y - n.sy) * e)]; };
+  const edge = (g, a, b, rest) => { g.moveTo(a[0], a[1]); if (rest) { const bx = Math.max(a[0], b[0]) + 26 * (P.W / BOX_W) + Math.abs(b[1] - a[1]) * 0.15; g.bezierCurveTo(bx, a[1], bx, b[1], b[0], b[1]); } else { const mx = (a[0] + b[0]) / 2; g.bezierCurveTo(mx, a[1], mx, b[1], b[0], b[1]); } };
+  function render() {
+    const g = cv.getContext('2d'); if (!g || P.W === 0) return;
+    g.setTransform(P.dpr, 0, 0, P.dpr, 0, 0); g.clearRect(0, 0, P.W, P.H);
+    const k = P.W / BOX_W, pts = field.points.map((_, i) => place(i));
+    const edgeIn = P.arrive >= 1 ? 1 : clamp((P.arrive - 0.45) / 0.55), dim = P.chain ? 0.55 : 1;
+    g.lineWidth = Math.max(0.6, 0.75 * k); g.strokeStyle = ink(C.edge, 0.2 * C.eg * edgeIn * dim);
+    g.beginPath(); for (const e of field.edges) edge(g, pts[e.a], pts[e.b], e.rest); g.stroke();
+    if (P.chain) { g.lineWidth = Math.max(1.1, 1.5 * k); g.strokeStyle = ink(C.trace, 0.85); g.beginPath(); for (const e of field.edges) if (P.chain.has(e.a) && P.chain.has(e.b)) edge(g, pts[e.a], pts[e.b], e.rest); g.stroke(); }
+    for (const type of [DOC, PASSAGE, CLAIM]) field.points.forEach((n, i) => {
+      if (n.type !== type) return;
+      const [X, Y] = pts[i]; const lit = P.chain ? P.chain.has(i) : false;
+      const e = P.arrive >= 1 ? 1 : ease(clamp((P.arrive - n.dly) / 0.7)); const depth = (n.d - 0.55) / 0.95;
+      const a = (0.32 + 0.55 * depth + (type === CLAIM ? 0.12 : 0) + (lit ? 0.4 : 0)) * C.ng * (lit ? 1 : dim) * (0.25 + 0.75 * e);
+      const col = lit && type !== DOC ? C.trace : type === DOC ? C.doc : type === PASSAGE ? C.pass : C.claim;
+      const sz = n.d * Math.pow(k, 0.55) * (lit ? 1.25 : 1) * K.size;
+      if (type === DOC) { g.lineCap = 'round'; g.lineWidth = Math.max(1.4, 2.4 * sz); g.strokeStyle = ink(lit ? C.trace : col, a); g.beginPath(); g.moveTo(X, Y); g.lineTo(X + n.len * k * 0.55 * (0.8 + 0.2 * e), Y); g.stroke(); }
+      else if (type === PASSAGE) { g.fillStyle = ink(col, a); g.beginPath(); g.arc(X, Y, Math.max(0.9, 1.9 * sz), 0, 6.2832); g.fill(); }
+      else { const rr = Math.max(2, 3.5 * sz); g.fillStyle = ink(col, a * 0.35); g.beginPath(); g.arc(X, Y, rr, 0, 6.2832); g.fill(); g.lineWidth = 1.2; g.strokeStyle = ink(col, a); g.stroke(); }
+    });
+    if (P.hot >= 0 && pts[P.hot]) { const [X, Y] = pts[P.hot]; g.lineWidth = 1.4; g.strokeStyle = ink(C.trace, 1); g.beginPath(); g.arc(X, Y, 7 + 3 * field.points[P.hot].d, 0, 6.2832); g.stroke(); }
+    if (K.marks) {
+      const t = 11, xa = sx(-6), xb = sx(FIELD.w + 6), ya = sy(-6), yb = sy(FIELD.h + 6);
+      g.lineWidth = 1; g.lineCap = 'butt'; g.strokeStyle = ink(C.edge, 0.35 * edgeIn); g.beginPath();
+      for (const [x, y, dx, dy] of [[xa, ya, 1, 1], [xb, ya, -1, 1], [xa, yb, 1, -1], [xb, yb, -1, -1]]) { g.moveTo(x, y + dy * t); g.lineTo(x, y); g.lineTo(x + dx * t, y); }
+      g.stroke();
+    }
+  }
+  P.schedule = function schedule() {
+    if (P.raf) return;
+    P.raf = requestAnimationFrame((now) => { P.raf = 0; if (P.arrive < 1) { if (!P.t0) P.t0 = now; P.arrive = K.arrival > 0 ? clamp((now - P.t0) / (K.arrival * 1000)) : 1; } render(); if (P.arrive < 1) P.schedule(); });
+  };
+  P.replay = () => { P.arrive = K.arrival > 0 ? 0 : 1; P.t0 = 0; P.schedule(); };
+  function resize() { const r = box.getBoundingClientRect(); P.W = r.width; P.H = r.height; P.dpr = Math.min(1.5, devicePixelRatio || 1); cv.width = Math.round(P.W * P.dpr); cv.height = Math.round(P.H * P.dpr); P.schedule(); }
+  new ResizeObserver(resize).observe(box);
+  box.addEventListener('pointermove', (ev) => {
+    if (ev.pointerType === 'touch') return;
+    const r = box.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+    let best = -1, bestD = 14;
+    field.points.forEach((_, i) => { const [X, Y] = place(i); const d = Math.hypot(X - x, Y - y); if (d < bestD) { bestD = d; best = i; } });
+    if (best === P.hot) return;
+    P.hot = best; P.chain = best >= 0 ? chainOf(field, best) : null; box.classList.toggle('hot', best >= 0);
+    if (best >= 0) {
+      const n = field.points[best];
+      tipEl.querySelector('b').textContent = ['Document', 'Passage', 'Claim'][n.type];
+      tipEl.querySelector('span').textContent = ' · ' + n.name + (n.type === PASSAGE ? ` · ${figure(n.at)} of ${figure(n.of)}` : '');
+      const [X, Y] = place(best); const flip = X > P.W * 0.6;
+      tipEl.style.transform = `translate3d(${(flip ? X - 14 : X + 14).toFixed(1)}px,${(Y - 38).toFixed(1)}px,0) translateX(${flip ? '-100%' : '0'})`;
+    }
+    P.schedule();
+  });
+  box.addEventListener('pointerleave', () => { if (P.hot < 0) return; P.hot = -1; P.chain = null; box.classList.remove('hot'); P.schedule(); });
+  return P;
+}
+
+// ---------------- the page (Press.svelte) ----------------
+let snapshot = [], plates = [];
+const numeral = (i) => String(i).padStart(2, '0');
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function build() {
+  list.textContent = ''; plates = [];
+  snapshot.forEach((entry, i) => {
+    const con = entry.constellation || fakeConstellation(entry, K.scale);
+    const field = buildField(con, entry.seed || entry.investigation);
+    const li = el('li', 'inv'); li.append(el('span', 'num', numeral(i + 1)));
+    const body = el('div', 'body');
+    const h = el('h2', 'ttl'); const a = el('a', null, entry.investigation); a.href = '#'; h.append(a); body.append(h);
+    if (entry.lead) body.append(el('p', 'q', entry.lead));
+    const P = makePlate(field); plates.push(P); body.append(P.box);
+    const t = con.totals;
+    body.append(el('p', 'cnt', `${figure(t.documents)} ${t.documents === 1 ? 'document' : 'documents'}, ${figure(t.marks)} ${t.marks === 1 ? 'passage' : 'passages'}, ${figure(t.claims)} ${t.claims === 1 ? 'claim' : 'claims'}.`));
+    const nav = el('nav', 'pages'); for (const p of ['Overview', 'Readings', 'Explorer']) { const pa = el('a', null, p); pa.href = '#'; nav.append(pa); } body.append(nav);
+    if ((entry.readings || []).length) { const r = el('div', 'reads'); r.append(el('span', null, 'Readings')); for (const title of entry.readings) { const ra = el('a', null, title); ra.href = '#'; r.append(ra); } body.append(r); }
+    li.append(body); list.append(li);
+  });
+  for (const [title, said] of [['Ask the agent', 'Claude is ready for questions.'], ['Take the walk', '9 steps, about four minutes.'], ['Signed in as TK', 'Sign out']]) {
+    const w = el('li', 'way-item'); const wa = el('a', null, title); wa.href = '#'; w.append(wa, el('span', null, said)); list.append(w);
+  }
+  document.getElementById('holds').textContent = `This bench holds ${snapshot.length} investigations.`;
+  plates.forEach((P) => P.replay());
+}
+
+// ---------------- wiring ----------------
+const knobs = document.getElementById('knobs');
+function syncKnobs() {
+  knobs.querySelectorAll('[data-k]').forEach((e) => { const k = e.dataset.k; const v = K[k] ?? (k === 'edgeGain' ? C.eg : k === 'nodeGain' ? C.ng : k === 'claimHex' ? '#' + C.claim.map((x) => x.toString(16).padStart(2, '0')).join('') : ''); if (e.type === 'checkbox') e.checked = !!v; else e.value = v; const o = e.parentElement.querySelector('output'); if (o) o.textContent = e.type === 'color' ? e.value : (+e.value).toFixed(2).replace(/\.?0+$/, ''); });
+}
+const redraw = () => plates.forEach((P) => P.schedule());
+knobs.addEventListener('input', (e) => { const t = e.target; const k = t.dataset.k; if (!k) return; K[k] = t.type === 'checkbox' ? t.checked : t.type === 'color' ? t.value : +t.value; readTokens(); if (k === 'scale') build(); else redraw(); syncKnobs(); });
+knobs.querySelectorAll('[data-scheme]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-scheme]').forEach((x) => x.classList.toggle('on', x === b)); press.classList.toggle('dark', b.dataset.scheme === 'dark'); K.edgeGain = K.nodeGain = K.claimHex = null; readTokens(); redraw(); syncKnobs(); });
+knobs.querySelectorAll('[data-width]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-width]').forEach((x) => x.classList.toggle('on', x === b)); const ph = b.dataset.width === 'phone'; document.getElementById('screen').classList.toggle('phone', ph); press.classList.toggle('phone', ph); });
+document.getElementById('replay').onclick = () => plates.forEach((P) => P.replay());
+document.getElementById('reset').onclick = () => { K = { ...DEFAULTS }; readTokens(); build(); syncKnobs(); };
+
+const snapBox = document.getElementById('snap');
+snapBox.value = document.getElementById('snapshot-default').textContent.trim();
+document.getElementById('apply').onclick = () => { try { snapshot = JSON.parse(snapBox.value); document.getElementById('snaperr').textContent = ''; build(); } catch (err) { document.getElementById('snaperr').textContent = String(err.message); } };
+snapshot = JSON.parse(snapBox.value); readTokens(); build(); syncKnobs();
+})();
+</script>
+</body></html>
