@@ -2,24 +2,25 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Recordbench — the Press (live node field, fixture snapshot)</title>
+<title>Recordbench — the Press (plates at rest, fixture snapshot)</title>
 <style>
   :root{
     /* family tokens (ragtime-design v0.2.1) */
     --rt-accent:#006a72;--rt-ink:#1d2125;--rt-ink-soft:#4a4f55;--rt-ink-faint:#767a7f;--rt-rule:#d8d4cb;--rt-paper:#f5f3ee;--rt-raised:#fbfaf7;--rt-press:#e8e1cf;
     --rt-font-ui:Inter,ui-sans-serif,system-ui,sans-serif;--rt-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
     --rt-font-didot:Didot,'Bodoni 72','Bodoni MT','Playfair Display',serif;--rt-font-iowan:'Iowan Old Style',Charter,Georgia,serif;
-    /* press tokens, as shipped in Recordbench app.css */
-    --press-paper:var(--rt-press);--press-paper-edge:#d9d0b8;--press-ink:#15130f;--press-ink-2:#4b4639;--press-ink-3:#7d7665;--press-plate:var(--rt-accent);
-    --press-hair:#15130f47;--press-shade:#15130f47;
-    --press-c-doc:21,19,15;--press-c-pass:21,19,15;--press-c-claim:0,106,114;--press-c-edge:21,19,15;--press-c-lit:21,19,15;--press-c-trace:0,106,114;
-    --press-pool:255,251,238;--press-pool-a:.55;--press-edge-gain:1.9;--press-node-gain:1.3;--press-night:0;
+    /* motion, as shipped */
+    --motion-state:220ms;--motion-settle:900ms;--motion-ease-standard:cubic-bezier(0.2,0,0,1);
+    /* press tokens, as shipped in Recordbench app.css after the decision #250 cut */
+    --press-paper:var(--rt-press);--press-paper-edge:#d9d0b8;--press-ink:#15130f;--press-ink-2:#4b4639;--press-plate:var(--rt-accent);--press-hair:#15130f47;
+    --press-c-doc:21,19,15;--press-c-pass:21,19,15;--press-c-claim:0,106,114;--press-c-edge:21,19,15;--press-c-trace:0,106,114;
+    --press-edge-gain:1.9;--press-node-gain:1.3;
   }
   .dark{
-    --rt-accent:#6cc0bf;--rt-press:#131416;
-    --press-paper-edge:#0c0d0e;--press-ink:#ece4d0;--press-ink-2:#b6af9c;--press-ink-3:#847e6e;--press-hair:#ece4d042;--press-shade:#0009;
-    --press-c-doc:150,146,132;--press-c-pass:190,184,166;--press-c-claim:108,192,191;--press-c-edge:160,155,140;--press-c-lit:255,243,214;--press-c-trace:108,192,191;
-    --press-pool:255,224,164;--press-pool-a:.14;--press-edge-gain:1.15;--press-node-gain:1;--press-night:1;
+    --rt-accent:#6cc0bf;--rt-press:#131416;--press-paper:var(--rt-press);--press-plate:var(--rt-accent);
+    --press-paper-edge:#0c0d0e;--press-ink:#ece4d0;--press-ink-2:#b6af9c;--press-hair:#ece4d042;
+    --press-c-doc:150,146,132;--press-c-pass:190,184,166;--press-c-claim:108,192,191;--press-c-edge:160,155,140;--press-c-trace:108,192,191;
+    --press-edge-gain:1.15;--press-node-gain:1;
   }
   *{box-sizing:border-box}
   body{margin:0;padding:28px;background:var(--rt-paper);color:var(--rt-ink);font:14px/1.5 var(--rt-font-ui)}
@@ -31,46 +32,51 @@
   .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--rt-accent);color:var(--rt-accent);border-radius:3px;margin-left:6px;vertical-align:2px}
   .wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:start}
 
-  /* ---------- the screen ---------- */
-  .screen{border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-  .press{position:relative;color:var(--press-ink);background:radial-gradient(120% 90% at 50% 40%,transparent 55%,var(--press-paper-edge) 130%),var(--press-paper)}
-  .mast .title{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:40px;align-items:end;padding:22px 24px 18px;border-bottom:4px double var(--press-ink)}
-  .mast h3{margin:0;font:700 44px/.8 var(--rt-font-didot);letter-spacing:-.045em;text-shadow:1.6px 1px 0 var(--press-plate)}
-  .mast p{margin:0;font:13px/1.4 var(--rt-font-iowan)}.mast p span+span{margin-left:.4em;color:var(--press-ink-2)}
-  .cluster{display:flex;align-items:center;gap:14px;margin-bottom:2px}
+  /* ---------- the screen (Press.svelte) ---------- */
+  .screen{border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin:0 auto;transition:max-width .2s}
+  .screen.phone{max-width:390px}
+  .press{color:var(--press-ink);font-family:var(--rt-font-iowan);-webkit-font-smoothing:antialiased;background:var(--press-paper)}
+  .mast .title{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:'word lede shell';gap:40px;align-items:end;padding:22px 24px 18px;border-bottom:4px double var(--press-ink)}
+  .mast h3{grid-area:word;margin:0;font:700 44px/.8 var(--rt-font-didot);letter-spacing:-.045em;white-space:nowrap;text-shadow:1.6px 1px 0 var(--press-plate)}
+  .mast p{grid-area:lede;margin:0;font:13px/1.4 var(--rt-font-iowan)}.mast p>*+*{margin-left:.4em;color:var(--press-ink-2)}
+  .mast p a{color:var(--press-ink-2);text-decoration:none}
+  .cluster{grid-area:shell;display:flex;align-items:center;gap:14px;margin-bottom:2px}
   .ico{width:30px;height:30px;display:grid;place-items:center;color:var(--press-ink-2);position:relative}
   .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
   .ico.bot{color:var(--press-plate)}.ico.bot b{position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#1f6b45;border:2px solid var(--press-paper)}
   .av{width:30px;height:30px;border-radius:50%;background:var(--press-ink);color:var(--press-paper);font:600 11px/30px var(--rt-font-ui);text-align:center}
-  .backbtn{position:absolute;z-index:20;top:12px;left:12px;font:600 12px var(--rt-font-ui);border:1px solid var(--press-ink);background:var(--press-paper);color:var(--press-ink);padding:6px 10px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
-  .press.open .backbtn{opacity:1;pointer-events:auto}
-  .stage{position:relative;width:100%;user-select:none}
-  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-  /* plates: the row labels under each field */
-  .plate{position:absolute;top:0;left:0;z-index:5;padding:7px 10px 9px 8px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s,opacity .2s}
-  .plate.show{background:color-mix(in srgb,var(--press-paper) 97%,transparent);border-color:var(--press-ink);box-shadow:4px 5px 0 -1px var(--press-hair),0 14px 30px -12px var(--press-shade)}
-  .plate.away{opacity:0;pointer-events:none}
-  .hd{display:flex;gap:8px;align-items:flex-start}
-  .num{min-width:46px;padding-top:3px;font:700 42px/.8 var(--rt-font-didot);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px var(--press-plate);transition:color .2s}
-  .plate.show .num{color:var(--press-plate)}
-  .ttl{padding-top:2px;font:700 19px/1.06 var(--rt-font-didot);letter-spacing:-.015em;text-shadow:1.5px 1px 0 var(--press-plate)}
-  .plate.show .ttl{text-shadow:none}
-  .cnt{display:block;margin:4px 0 0 54px;font:11px var(--rt-font-mono);color:var(--press-ink-3)}
-  .cnt b{font-weight:600;color:var(--press-ink-2)}
-  .q{display:block;margin:6px 0 0 54px;font:13px/1.35 var(--rt-font-iowan);color:var(--press-ink-2);max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
-  .plate.show .q{max-height:80px;opacity:1}
-  .enter{display:none;margin:8px 0 0 54px;font:600 12px var(--rt-font-ui);color:var(--press-plate)}
-  .press.open .plate.show .enter{display:inline-block}
-  /* wide: on hover the question takes a column to the right of the title, so the plate grows sideways, never down */
-  .plate.wide.show{display:grid;grid-template-columns:44% minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:4px}
-  .plate.wide.show .hd{grid-area:1/1}.plate.wide.show .cnt{grid-area:2/1}
-  .plate.wide.show .q{grid-area:1/2/3/3;margin:2px 0 0 10px}
-  .plate.wide.show .enter{grid-column:1/-1}
-  .tip{position:absolute;z-index:30;top:0;left:0;pointer-events:none;opacity:0;background:var(--press-paper);border:1px solid var(--press-ink);padding:5px 8px;max-width:300px;box-shadow:3px 4px 0 -1px var(--press-hair)}
-  .tip small{display:block;font:600 11px var(--rt-font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--press-plate)}
-  .tip span{display:block;font:13px/1.3 var(--rt-font-iowan)}
-  .tip em{display:block;font:11px var(--rt-font-mono);font-style:normal;color:var(--press-ink-3)}
+  .plates{margin:0 auto;padding:0 24px;max-width:1080px;list-style:none}
+  .inv{display:grid;grid-template-columns:84px minmax(0,1fr);column-gap:16px;padding:28px 0 30px;border-bottom:1px solid var(--press-hair)}
+  .num{padding-top:2px;font:700 60px/.8 var(--rt-font-didot);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px var(--press-plate);user-select:none;transition:color var(--motion-state) var(--motion-ease-standard)}
+  .inv:hover .num,.inv:focus-within .num{color:var(--press-plate)}
+  .body{display:grid;gap:8px;min-width:0}
+  .press .ttl{margin:0;padding:0;border:0;text-transform:none;color:inherit;font:700 28px/1.06 var(--rt-font-didot);letter-spacing:-.015em}
+  .ttl a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}.ttl a:hover{border-bottom-color:var(--press-plate)}
+  .q{margin:0;max-width:62ch;font:16px/1.45 var(--rt-font-iowan)}
+  .plate{position:relative;width:100%;max-width:46rem;margin:6px 0 2px;border:1px solid var(--press-hair);background:var(--press-paper);cursor:pointer}
+  .plate canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .tip{position:absolute;left:0;top:0;z-index:2;max-width:22rem;padding:5px 9px;font:13px var(--rt-font-iowan);color:var(--press-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;background:var(--press-paper);border:1px solid var(--press-ink);box-shadow:3px 4px 0 -1px var(--press-hair);transition:opacity var(--motion-state) var(--motion-ease-standard)}
+  .plate.hot .tip{opacity:1}
+  .tip b{font:400 10.5px var(--rt-font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--press-plate)}
+  .cnt{margin:0;font:12.5px/1.5 var(--rt-font-mono);color:var(--press-ink-2)}
+  .pages{font:14px/1.5 var(--rt-font-iowan);display:flex;flex-wrap:wrap;gap:4px 18px}
+  .pages a{color:var(--press-ink);text-decoration:none;border-bottom:1px solid var(--press-hair)}
+  .reads{font:13.5px/1.5 var(--rt-font-iowan);color:var(--press-ink-2)}
+  .reads span{display:block;font:400 10.5px var(--rt-font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--press-ink-2);margin:2px 0}
+  .reads a{color:var(--press-ink);text-decoration:none;margin-right:16px}
+  .way-item{display:inline-flex;flex-direction:column;gap:3px;width:33%;padding:18px 22px 24px 0;vertical-align:top}
+  .way-item a{font:14px var(--rt-font-iowan);color:var(--press-ink-2);text-decoration:none}
+  .way-item span{font:12.5px/1.4 var(--rt-font-iowan);color:var(--press-ink-2)}
+
+  /* phone (≤640px in the app): the same page, tighter */
+  .phone .mast .title{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'word shell' 'lede lede';gap:4px;padding:16px 14px 14px}
+  .phone .mast h3{font-size:36px}.phone .mast p{font-size:12px}.phone .mast p>:nth-child(n+2){display:none}
+  .phone .cluster .ico{display:none}
+  .phone .plates{padding:0 14px}
+  .phone .inv{grid-template-columns:40px minmax(0,1fr);column-gap:10px;padding:18px 0 20px}
+  .phone .num{font-size:30px}.phone .press .ttl,.press.phone .ttl{font-size:21px}.phone .q{font-size:14.5px}
+  .phone .way-item{width:100%;padding:12px 0 6px}
 
   /* ---------- knobs ---------- */
   .knobs{position:sticky;top:16px;background:var(--rt-raised);border:1px solid var(--rt-rule);border-radius:3px;padding:12px 14px;font-size:12px}
@@ -90,17 +96,17 @@
 <body>
 <a class="back-ix" href="../index.html">← Index</a>
 <h1>Recordbench — the Press <span class="tag">live · fixture snapshot</span></h1>
-<p class="lede0">The front page as shipped (decision #241, <code>Press.svelte</code> + <code>lib/press.ts</code> at <code>origin/main</code> 977a820), re-implemented here on a plain canvas so it can be iterated in Claude Design. Each investigation is a field: <b>documents</b> are bars on the left, <b>passages</b> are dots, <b>claims</b> are rings on the right, and curves join a document through its passages to the claims they support. A claim built on another claim gets its own curve, which loops out to the right. The field layout is the shipped <code>buildField</code>, verbatim. Hover a point to trace its chain; click a field or its plate to dive in; Esc or Back to come out. The data is a fake snapshot (edit it below) in the API's <code>Constellation</code> shape. Investigation names come from <code>fixtures.json</code>.</p>
+<p class="lede0">The front page after the decision #250 cut (<code>Press.svelte</code> + <code>PressPlate.svelte</code> + <code>lib/press.ts</code>), re-implemented on plain canvases so it can be iterated in Claude Design. The Press is now a normal page: the masthead, then one investigation after another in the document's flow, each with a <b>plate</b> drawn at rest. A plate has no camera, no pan, no zoom, no dive and no open state; its box is the field's own aspect ratio, so the page never moves when it paints. On a plate, <b>documents</b> are bars on the left, <b>passages</b> are dots, <b>claims</b> are rings on the right, and curves join a document through its passages to the claims they support. A claim built on another claim loops out to the right. The field layout is the shipped <code>buildField</code>, verbatim. Hover a point to trace its chain. The draw-in plays once a session per plate (here: <b>Replay draw-in</b>). The descent into an investigation is the page change itself: the plate is named for the router's cross-fade and grows into the overview's header. Investigation names come from <code>fixtures.json</code>.</p>
 
 <div class="wrap">
 <div>
-  <div class="screen"><div class="press" id="press">
+  <div class="screen" id="screen"><div class="press" id="press">
     <header class="mast"><div class="title">
       <h3>recordbench</h3>
-      <p><span>Recordbench keeps the record of an investigation. It keeps every source, quoted passage, claim, and review, and it says who did what and when.</span><span>Read what this tool is, and what the record promises.</span><span id="holds"></span></p>
+      <p><span>Recordbench keeps the record of an investigation. It keeps every source, quoted passage, claim, and review, and it says who did what and when.</span><a href="#">Read what this tool is, and what the record promises.</a><span id="holds"></span></p>
       <div class="cluster"><div class="ico bot" title="Agent connected"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></div><div class="ico" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div><div class="av">TK</div></div>
     </div></header>
-    <div class="stage" id="stage"><button class="backbtn" id="backbtn">← Back to the bench</button><canvas id="cv"></canvas><div class="tip" id="tip"><small></small><span></span><em></em></div></div>
+    <ol class="plates" id="plates"></ol>
   </div></div>
   <div class="legend">
     <span><i style="width:22px;height:3px;border-radius:2px;background:#15130f"></i>Document (bar length ∝ √ text length)</span>
@@ -113,8 +119,8 @@
 <aside class="knobs" id="knobs">
   <h4>Scheme</h4>
   <div class="row"><button data-scheme="light" class="on">Light</button><button data-scheme="dark">Dark</button></div>
-  <h4>Columns</h4>
-  <div class="row"><button data-cols="auto" class="on">Auto</button><button data-cols="1">1</button><button data-cols="2">2</button></div>
+  <h4>Width</h4>
+  <div class="row"><button data-width="desk" class="on">Desktop</button><button data-width="phone">Phone</button></div>
   <hr>
   <h4>Ink</h4>
   <label>Edge gain <output></output><input type="range" data-k="edgeGain" min="0" max="4" step=".05"></label>
@@ -123,38 +129,43 @@
   <label>Claim colour <output></output><input type="color" data-k="claimHex" style="grid-column:1/-1;width:100%;height:24px;border:0;padding:0;background:none"></label>
   <hr>
   <h4>Motion</h4>
-  <label>Focus lens radius <output></output><input type="range" data-k="lensR" min="0" max="300" step="5"></label>
-  <label>Lens push (px) <output></output><input type="range" data-k="lensPush" min="0" max="20" step=".5"></label>
-  <label>Arrival (s) <output></output><input type="range" data-k="arrival" min="0" max="4" step=".1"></label>
-  <label>Camera settle <output></output><input type="range" data-k="settle" min=".02" max=".4" step=".01"></label>
+  <label>Draw-in (s) <output></output><input type="range" data-k="arrival" min="0" max="5" step=".05"></label>
   <hr>
   <h4>Sampling</h4>
   <label>Record size × <output></output><input type="range" data-k="scale" min=".1" max="6" step=".1"></label>
   <label style="grid-template-columns:1fr auto"><span>Register marks</span><input type="checkbox" data-k="marks"></label>
-  <div class="row"><button id="replay">Replay arrival</button><button id="reset">Reset knobs</button></div>
+  <div class="row"><button id="replay">Replay draw-in</button><button id="reset">Reset knobs</button></div>
 </aside>
 </div>
 
 <h2>The snapshot</h2>
-<p class="notes">Five fixture investigations. Each entry gives the plate's words and the record's totals; <code>constellation</code> is either generated from <code>seed</code> and <code>shape</code> (below) or given literally in the API's shape (<code>documents[{name,length,marks_total,marks[{start,claims[]}]}]</code>, <code>claims[{name,rests_on[]}]</code>, <code>totals</code>). Paste a literal constellation into any entry to see real shape. Edit, then <b>Apply</b>.</p>
+<p class="notes">Five fixture investigations. Each entry gives the plate's words, the readings listed under it and the record's totals; <code>constellation</code> is either generated from <code>seed</code> and <code>shape</code> (below) or given literally in the API's shape (<code>documents[{name,length,marks_total,marks[{start,claims[]}]}]</code>, <code>claims[{name,rests_on[]}]</code>, <code>totals</code>). Paste a literal constellation into any entry to see real shape. Edit, then <b>Apply</b>.</p>
 <textarea id="snap"></textarea>
 <div class="row" style="margin-top:8px;display:flex;gap:8px"><button id="apply" style="font:500 12px var(--rt-font-ui);padding:5px 12px;border:1px solid var(--rt-accent);background:var(--rt-accent);color:#fff;border-radius:3px;cursor:pointer">Apply snapshot</button><span id="snaperr" style="color:#a3231f;font-size:12px"></span></div>
 
+<h2>What was cut (decision #250)</h2>
+<ul class="notes">
+  <li><b>The single field.</b> One canvas holding every investigation, with a camera, a dive into one field, a Back strip, the focus lens, the light pool and the arrival over the masthead. Each investigation now draws its own plate in the page's flow.</li>
+  <li><b>Tokens gone from <code>app.css</code>:</b> <code>--press-ink-3</code>, <code>--press-shade</code>, <code>--press-plate-bg</code>, <code>--press-plate-clear</code>, <code>--press-toner-solid</code>, <code>--press-c-lit</code>, <code>--press-pool</code>, <code>--press-pool-a</code>, <code>--press-grain-tint</code>, <code>--press-grain-amp</code>, <code>--press-night</code>, the <code>@property</code> axes <code>--press-k/-p/-arr/-cen</code>, and <code>--motion-live</code>.</li>
+  <li><b>The other bench designs.</b> Cards, Desk and Cabinet, the dev-only design switch and every <code>--desk-*</code> token. Press is the only front page.</li>
+  <li><b>On the bench root:</b> the find bar, the per-row hues, the PlateArt cards and the Plates dials in settings.</li>
+</ul>
+
 <h2>What to iterate on</h2>
 <ul class="notes">
-  <li><b>Plate type.</b> Didot titles with a misregistered teal shadow, outlined numerals that fill on hover. The plate is the only Didot in the app besides the masthead.</li>
-  <li><b>Ink balance.</b> Shipped gains are 1.9 (edges) and 1.3 (nodes) in light, 1.15 and 1 in dark. Claims are the one coloured mark; everything else is press ink.</li>
-  <li><b>Phone.</b> Below 640px the stage is not mounted at all (owner, 2026-10-15): the plates become a plain numbered list. See the Recordbench shell card, Proposal C.</li>
-  <li><b>Not ported:</b> paper grain bitmap, depth parallax while panning, the press-down plate inset, drag to pan when dived, the edge bitmap cache. Each is a performance or texture detail, not layout.</li>
+  <li><b>Plate type.</b> Didot titles at 28px (21px on a phone) and outlined numerals that fill on hover or focus. The plate's words sit outside the canvas now, so the title no longer carries the misregistered shadow; only the masthead does.</li>
+  <li><b>Ink balance.</b> Shipped gains are 1.9 (edges) and 1.3 (nodes) in light, 1.15 and 1 in dark. At rest every edge is drawn at 0.2 alpha × gain; a traced chain dims the rest to 0.55. Claims are the one coloured mark.</li>
+  <li><b>Draw-in.</b> Once a session per plate, over <code>--motion-settle</code> × 2.5 (2.25s), eased by <code>--motion-ease-standard</code>. None at a motion dial of zero.</li>
+  <li><b>Phone.</b> Same page, narrower: the plate stays, the lede drops to its first sentence, the numeral column shrinks to 40px, and the agent and gear move to the dock. Hover tracing is off for touch.</li>
 </ul>
 
 <script type="application/json" id="snapshot-default">
 [
-  {"investigation":"Agency rule changes","lead":"Which rules changed without notice and comment, and what did the agencies say about why?","totals":{"documents":214,"marks":620,"claims":61},"seed":"agency","shape":{"restsOn":0.25,"skew":1.4}},
-  {"investigation":"Grant terminations","lead":"Which grants were ended, by whom, and on what stated ground?","totals":{"documents":82,"marks":240,"claims":19},"seed":"grants","shape":{"restsOn":0.15,"skew":1.0}},
-  {"investigation":"Court filings review","lead":"What do the filings say the government did, and what did the court find?","totals":{"documents":40,"marks":180,"claims":12},"seed":"court","shape":{"restsOn":0.35,"skew":2.2}},
-  {"investigation":"Public statements","lead":"What did officials say in public, and does the record bear it out?","totals":{"documents":33,"marks":64,"claims":0},"seed":"statements","shape":{"restsOn":0,"skew":0.8}},
-  {"investigation":"Sanctions designations","lead":"Which designations rest on public evidence, and which on none?","totals":{"documents":120,"marks":410,"claims":38},"seed":"sanctions","shape":{"restsOn":0.2,"skew":1.6}}
+  {"investigation":"Agency rule changes","lead":"Which rules changed without notice and comment, and what did the agencies say about why?","readings":["What changed, and when","The reasons the agencies gave"],"totals":{"documents":214,"marks":620,"claims":61},"seed":"agency","shape":{"restsOn":0.25,"skew":1.4}},
+  {"investigation":"Grant terminations","lead":"Which grants were ended, by whom, and on what stated ground?","readings":["Letters sent the same week"],"totals":{"documents":82,"marks":240,"claims":19},"seed":"grants","shape":{"restsOn":0.15,"skew":1.0}},
+  {"investigation":"Court filings review","lead":"What do the filings say the government did, and what did the court find?","readings":[],"totals":{"documents":40,"marks":180,"claims":12},"seed":"court","shape":{"restsOn":0.35,"skew":2.2}},
+  {"investigation":"Public statements","lead":"What did officials say in public, and does the record bear it out?","readings":[],"totals":{"documents":33,"marks":64,"claims":0},"seed":"statements","shape":{"restsOn":0,"skew":0.8}},
+  {"investigation":"Sanctions designations","lead":"Which designations rest on public evidence, and which on none?","readings":["Designations with no public evidence"],"totals":{"documents":120,"marks":410,"claims":38},"seed":"sanctions","shape":{"restsOn":0.2,"skew":1.6}}
 ]
 </script>
 
@@ -219,152 +230,133 @@ function fakeConstellation(entry, scale) {
   return { documents: docs, claims, totals: { ...T, without_text: 0 } };
 }
 
-// ---------------- the engine (simplified Press.svelte) ----------------
-const DEFAULTS = { edgeGain: null, nodeGain: null, size: 1, claimHex: null, lensR: 150, lensPush: 7, arrival: 1.4, settle: 0.14, scale: 1, marks: true };
-let K = { ...DEFAULTS }, colsMode = 'auto';
-const press = document.getElementById('press'), stage = document.getElementById('stage'), cv = document.getElementById('cv'), ctx = cv.getContext('2d'), tip = document.getElementById('tip');
-const CW = 640, GX = 20, GY = 8, GW = FIELD.w, GH = FIELD.h; let BAND = 92;
-let snapshot = [], invs = [], W = 0, H = 0, dpr = 1, cols = 2, kHome = 1, CH = 0;
-const cam = { x: 0, y: 0, k: 1 }, tgt = { x: 0, y: 0, k: 1 }, home = { x: 0, y: 0, k: 1 };
-let openIdx = -1, hover = -1, hot = null, fx = -1e4, fy = -1e4, focus = 0, tA = 0, t0 = performance.now(), C = {};
-const cellX = (i) => (i % cols) * CW, cellY = (i) => Math.floor(i / cols) * CH;
+// ---------------- one plate (PressPlate.svelte) ----------------
+const PAD = 14, BOX_W = FIELD.w + PAD * 2, BOX_H = FIELD.h + PAD * 2;
+const DEFAULTS = { edgeGain: null, nodeGain: null, size: 1, claimHex: null, arrival: 2.25, scale: 1, marks: true };
+let K = { ...DEFAULTS };
+const press = document.getElementById('press'), list = document.getElementById('plates');
 const tok = (n) => getComputedStyle(press).getPropertyValue(n).trim();
 const trip = (n) => tok(n).split(',').map(Number);
 const hexTrip = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-const ink = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0, Math.min(1, a))})`;
-const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-const clamp = (v) => Math.max(0, Math.min(1, v));
-const ease = (t) => 1 - Math.pow(1 - t, 3);
-function readColors() {
-  C = { doc: trip('--press-c-doc'), pass: trip('--press-c-pass'), claim: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-claim'), edge: trip('--press-c-edge'), lit: trip('--press-c-lit'), trace: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-trace'), pool: trip('--press-pool'), poolA: parseFloat(tok('--press-pool-a')), eg: K.edgeGain ?? parseFloat(tok('--press-edge-gain')), ng: K.nodeGain ?? parseFloat(tok('--press-node-gain')) };
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ink = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a).toFixed(3)})`;
+function curve(text) {
+  const m = /cubic-bezier\(([^)]+)\)/.exec(text); const p = m ? m[1].split(',').map(Number) : [];
+  if (p.length !== 4) return (x) => x; const [x1, y1, x2, y2] = p;
+  const at = (t, a, b) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+  return (x) => { let lo = 0, hi = 1; for (let i = 0; i < 20; i++) { const mid = (lo + hi) / 2; if (at(mid, x1, x2) < x) lo = mid; else hi = mid; } return at((lo + hi) / 2, y1, y2); };
 }
+let C = {}, ease = (x) => x;
+function readTokens() {
+  C = { doc: trip('--press-c-doc'), pass: trip('--press-c-pass'), claim: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-claim'), edge: trip('--press-c-edge'), trace: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-trace'), eg: K.edgeGain ?? parseFloat(tok('--press-edge-gain')), ng: K.nodeGain ?? parseFloat(tok('--press-node-gain')) };
+  ease = curve(tok('--motion-ease-standard'));
+}
+
+function makePlate(field) {
+  const box = document.createElement('div'); box.className = 'plate'; box.style.aspectRatio = `${BOX_W} / ${BOX_H}`; box.setAttribute('aria-hidden', 'true');
+  box.innerHTML = '<canvas></canvas><div class="tip"><b></b><span></span></div>';
+  const cv = box.querySelector('canvas'), tipEl = box.querySelector('.tip');
+  const P = { field, box, W: 0, H: 0, dpr: 1, hot: -1, chain: null, arrive: 1, t0: 0, raf: 0 };
+  const sx = (x) => ((x + PAD) / BOX_W) * P.W, sy = (y) => ((y + PAD) / BOX_H) * P.H;
+  const place = (i) => { const n = field.points[i]; const e = P.arrive >= 1 ? 1 : ease(clamp((P.arrive - n.dly) / 0.7)); return [sx(n.sx + (n.x - n.sx) * e), sy(n.sy + (n.y - n.sy) * e)]; };
+  const edge = (g, a, b, rest) => { g.moveTo(a[0], a[1]); if (rest) { const bx = Math.max(a[0], b[0]) + 26 * (P.W / BOX_W) + Math.abs(b[1] - a[1]) * 0.15; g.bezierCurveTo(bx, a[1], bx, b[1], b[0], b[1]); } else { const mx = (a[0] + b[0]) / 2; g.bezierCurveTo(mx, a[1], mx, b[1], b[0], b[1]); } };
+  function render() {
+    const g = cv.getContext('2d'); if (!g || P.W === 0) return;
+    g.setTransform(P.dpr, 0, 0, P.dpr, 0, 0); g.clearRect(0, 0, P.W, P.H);
+    const k = P.W / BOX_W, pts = field.points.map((_, i) => place(i));
+    const edgeIn = P.arrive >= 1 ? 1 : clamp((P.arrive - 0.45) / 0.55), dim = P.chain ? 0.55 : 1;
+    g.lineWidth = Math.max(0.6, 0.75 * k); g.strokeStyle = ink(C.edge, 0.2 * C.eg * edgeIn * dim);
+    g.beginPath(); for (const e of field.edges) edge(g, pts[e.a], pts[e.b], e.rest); g.stroke();
+    if (P.chain) { g.lineWidth = Math.max(1.1, 1.5 * k); g.strokeStyle = ink(C.trace, 0.85); g.beginPath(); for (const e of field.edges) if (P.chain.has(e.a) && P.chain.has(e.b)) edge(g, pts[e.a], pts[e.b], e.rest); g.stroke(); }
+    for (const type of [DOC, PASSAGE, CLAIM]) field.points.forEach((n, i) => {
+      if (n.type !== type) return;
+      const [X, Y] = pts[i]; const lit = P.chain ? P.chain.has(i) : false;
+      const e = P.arrive >= 1 ? 1 : ease(clamp((P.arrive - n.dly) / 0.7)); const depth = (n.d - 0.55) / 0.95;
+      const a = (0.32 + 0.55 * depth + (type === CLAIM ? 0.12 : 0) + (lit ? 0.4 : 0)) * C.ng * (lit ? 1 : dim) * (0.25 + 0.75 * e);
+      const col = lit && type !== DOC ? C.trace : type === DOC ? C.doc : type === PASSAGE ? C.pass : C.claim;
+      const sz = n.d * Math.pow(k, 0.55) * (lit ? 1.25 : 1) * K.size;
+      if (type === DOC) { g.lineCap = 'round'; g.lineWidth = Math.max(1.4, 2.4 * sz); g.strokeStyle = ink(lit ? C.trace : col, a); g.beginPath(); g.moveTo(X, Y); g.lineTo(X + n.len * k * 0.55 * (0.8 + 0.2 * e), Y); g.stroke(); }
+      else if (type === PASSAGE) { g.fillStyle = ink(col, a); g.beginPath(); g.arc(X, Y, Math.max(0.9, 1.9 * sz), 0, 6.2832); g.fill(); }
+      else { const rr = Math.max(2, 3.5 * sz); g.fillStyle = ink(col, a * 0.35); g.beginPath(); g.arc(X, Y, rr, 0, 6.2832); g.fill(); g.lineWidth = 1.2; g.strokeStyle = ink(col, a); g.stroke(); }
+    });
+    if (P.hot >= 0 && pts[P.hot]) { const [X, Y] = pts[P.hot]; g.lineWidth = 1.4; g.strokeStyle = ink(C.trace, 1); g.beginPath(); g.arc(X, Y, 7 + 3 * field.points[P.hot].d, 0, 6.2832); g.stroke(); }
+    if (K.marks) {
+      const t = 11, xa = sx(-6), xb = sx(FIELD.w + 6), ya = sy(-6), yb = sy(FIELD.h + 6);
+      g.lineWidth = 1; g.lineCap = 'butt'; g.strokeStyle = ink(C.edge, 0.35 * edgeIn); g.beginPath();
+      for (const [x, y, dx, dy] of [[xa, ya, 1, 1], [xb, ya, -1, 1], [xa, yb, 1, -1], [xb, yb, -1, -1]]) { g.moveTo(x, y + dy * t); g.lineTo(x, y); g.lineTo(x + dx * t, y); }
+      g.stroke();
+    }
+  }
+  P.schedule = function schedule() {
+    if (P.raf) return;
+    P.raf = requestAnimationFrame((now) => { P.raf = 0; if (P.arrive < 1) { if (!P.t0) P.t0 = now; P.arrive = K.arrival > 0 ? clamp((now - P.t0) / (K.arrival * 1000)) : 1; } render(); if (P.arrive < 1) P.schedule(); });
+  };
+  P.replay = () => { P.arrive = K.arrival > 0 ? 0 : 1; P.t0 = 0; P.schedule(); };
+  function resize() { const r = box.getBoundingClientRect(); P.W = r.width; P.H = r.height; P.dpr = Math.min(1.5, devicePixelRatio || 1); cv.width = Math.round(P.W * P.dpr); cv.height = Math.round(P.H * P.dpr); P.schedule(); }
+  new ResizeObserver(resize).observe(box);
+  box.addEventListener('pointermove', (ev) => {
+    if (ev.pointerType === 'touch') return;
+    const r = box.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+    let best = -1, bestD = 14;
+    field.points.forEach((_, i) => { const [X, Y] = place(i); const d = Math.hypot(X - x, Y - y); if (d < bestD) { bestD = d; best = i; } });
+    if (best === P.hot) return;
+    P.hot = best; P.chain = best >= 0 ? chainOf(field, best) : null; box.classList.toggle('hot', best >= 0);
+    if (best >= 0) {
+      const n = field.points[best];
+      tipEl.querySelector('b').textContent = ['Document', 'Passage', 'Claim'][n.type];
+      tipEl.querySelector('span').textContent = ' · ' + n.name + (n.type === PASSAGE ? ` · ${figure(n.at)} of ${figure(n.of)}` : '');
+      const [X, Y] = place(best); const flip = X > P.W * 0.6;
+      tipEl.style.transform = `translate3d(${(flip ? X - 14 : X + 14).toFixed(1)}px,${(Y - 38).toFixed(1)}px,0) translateX(${flip ? '-100%' : '0'})`;
+    }
+    P.schedule();
+  });
+  box.addEventListener('pointerleave', () => { if (P.hot < 0) return; P.hot = -1; P.chain = null; box.classList.remove('hot'); P.schedule(); });
+  return P;
+}
+
+// ---------------- the page (Press.svelte) ----------------
+let snapshot = [], plates = [];
+const numeral = (i) => String(i).padStart(2, '0');
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function build() {
-  stage.querySelectorAll('.plate').forEach((p) => p.remove());
-  invs = snapshot.map((entry, i) => {
+  list.textContent = ''; plates = [];
+  snapshot.forEach((entry, i) => {
     const con = entry.constellation || fakeConstellation(entry, K.scale);
     const field = buildField(con, entry.seed || entry.investigation);
-    const el = document.createElement('div'); el.className = 'plate';
+    const li = el('li', 'inv'); li.append(el('span', 'num', numeral(i + 1)));
+    const body = el('div', 'body');
+    const h = el('h2', 'ttl'); const a = el('a', null, entry.investigation); a.href = '#'; h.append(a); body.append(h);
+    if (entry.lead) body.append(el('p', 'q', entry.lead));
+    const P = makePlate(field); plates.push(P); body.append(P.box);
     const t = con.totals;
-    el.innerHTML = `<span class="hd"><span class="num">${String(i + 1).padStart(2, '0')}</span><span class="ttl"></span></span><span class="cnt"><b>${figure(t.documents)}</b> documents, <b>${figure(t.marks)}</b> passages, <b>${figure(t.claims)}</b> claims</span><span class="q"></span><span class="enter">Open this investigation →</span>`;
-    el.querySelector('.ttl').textContent = entry.investigation; el.querySelector('.q').textContent = entry.lead || '';
-    el.addEventListener('mouseenter', () => { hover = i; }); el.addEventListener('mouseleave', () => { if (hover === i) hover = -1; });
-    el.addEventListener('click', () => (openIdx === i ? null : dive(i)));
-    stage.appendChild(el);
-    return { entry, field, el, X: [], Y: [], F: [], h: 0 };
+    body.append(el('p', 'cnt', `${figure(t.documents)} ${t.documents === 1 ? 'document' : 'documents'}, ${figure(t.marks)} ${t.marks === 1 ? 'passage' : 'passages'}, ${figure(t.claims)} ${t.claims === 1 ? 'claim' : 'claims'}.`));
+    const nav = el('nav', 'pages'); for (const p of ['Overview', 'Readings', 'Explorer']) { const pa = el('a', null, p); pa.href = '#'; nav.append(pa); } body.append(nav);
+    if ((entry.readings || []).length) { const r = el('div', 'reads'); r.append(el('span', null, 'Readings')); for (const title of entry.readings) { const ra = el('a', null, title); ra.href = '#'; r.append(ra); } body.append(r); }
+    li.append(body); list.append(li);
   });
-  document.getElementById('holds').textContent = `This bench holds ${invs.length} investigations.`;
-  layout(true); t0 = performance.now();
-}
-function layout(snap) {
-  W = stage.clientWidth; dpr = Math.min(1.5, devicePixelRatio || 1);
-  cols = colsMode === 'auto' ? (W < 760 || invs.length === 1 ? 1 : 2) : +colsMode;
-  kHome = Math.min((W - 48) / (cols * CW), 1.25);
-  BAND = 92 / kHome * 0.9; CH = GY + GH + BAND;
-  H = Math.ceil(Math.ceil(invs.length / cols) * CH * kHome + 20);
-  stage.style.height = H + 'px'; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-  home.x = (cols * CW) / 2; home.y = (Math.ceil(invs.length / cols) * CH) / 2; home.k = kHome;
-  if (openIdx >= 0) dive(openIdx, snap); else { Object.assign(tgt, home); if (snap) Object.assign(cam, home); }
-}
-function dive(i, snap) {
-  openIdx = i; const kOpen = Math.max(kHome * 1.15, Math.min((W - 80) / GW, (H - 140) / GH));
-  tgt.k = kOpen; tgt.x = cellX(i) + GX + GW / 2; tgt.y = cellY(i) + GY + GH / 2 + (H / 2 - (40 + GH * kOpen / 2)) / kOpen;
-  if (snap) Object.assign(cam, tgt); press.classList.add('open');
-}
-function out() { openIdx = -1; Object.assign(tgt, home); press.classList.remove('open'); }
-function toScreen(wx, wy) { return [(wx - cam.x) * cam.k + W / 2, (wy - cam.y) * cam.k + H / 2]; }
-function edgePath(X, Y, a, b, rest) { const x0 = X[a], y0 = Y[a], x1 = X[b], y1 = Y[b]; ctx.moveTo(x0, y0); if (rest) { const bx = Math.max(x0, x1) + 26 + Math.abs(y1 - y0) * 0.15; ctx.bezierCurveTo(bx, y0, bx, y1, x1, y1); } else { const mx = (x0 + x1) / 2; ctx.bezierCurveTo(mx, y0, mx, y1, x1, y1); } }
-
-function frame(now) {
-  requestAnimationFrame(frame);
-  const s = K.settle; cam.x += (tgt.x - cam.x) * s; cam.y += (tgt.y - cam.y) * s; cam.k *= Math.pow(tgt.k / cam.k, s);
-  const A = K.arrival > 0 ? Math.min(1, (now - t0) / 1000 / K.arrival) : 1;
-  const inside = fx > -1e3; focus += ((inside ? 1 : 0) - focus) * 0.15;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-  const k = cam.k, kr = k / kHome, rScale = Math.pow(kr, 0.55) * K.size, lw = 0.7 * Math.pow(kr, 0.45);
-  if (focus > 0.01) { const g = ctx.createRadialGradient(fx, fy, 0, fx, fy, 300); g.addColorStop(0, ink(C.pool, C.poolA * focus)); g.addColorStop(1, ink(C.pool, 0)); ctx.fillStyle = g; ctx.fillRect(fx - 300, fy - 300, 600, 600); }
-  let best = null, bestD = 1e9;
-  invs.forEach((c, ci) => {
-    c.h += ((hover === ci ? 1 : 0) - c.h) * 0.18;
-    const ox = cellX(ci) + GX, oy = cellY(ci) + GY, N = c.field.points, open = openIdx === ci;
-    c.o = open ? Math.min(1, (kr - 1) / 0.3) : 0;
-    c.dim = openIdx >= 0 && !open ? 0.15 : 1;
-    const sc = 1 + 0.02 * c.h;
-    for (let i = 0; i < N.length; i++) {
-      const n = N[i]; const e = ease(clamp((A - n.dly) / 0.6));
-      const lx = n.sx + (n.x - n.sx) * e, ly = n.sy + (n.y - n.sy) * e;
-      let [X, Y] = toScreen(ox + GW / 2 + (lx - GW / 2) * sc, oy + GH / 2 + (ly - GH / 2) * sc);
-      const dx = X - fx, dy = Y - fy, d = Math.hypot(dx, dy) || 1;
-      if (c.dim === 1 && d < 11 + 17 * (1 - c.o) && d < bestD) { bestD = d; best = { c: ci, i }; }
-      const fo = K.lensR > 0 ? focus * Math.pow(Math.max(0, 1 - d / K.lensR), 2) : 0;
-      X += (dx / d) * fo * K.lensPush; Y += (dy / d) * fo * K.lensPush;
-      c.X[i] = X; c.Y[i] = Y; c.F[i] = fo;
-    }
-    // plate under the field
-    const fw = Math.min(GW * k, W - 24);
-    const [px] = toScreen(ox, 0); const [, py] = toScreen(0, oy + GH);
-    c.el.style.width = fw + 'px'; c.el.classList.toggle('wide', fw >= 520); c.el.style.transform = `translate(${Math.max(12, Math.min(px, W - fw - 12))}px,${py + 10}px)`;
-    c.el.classList.toggle('show', hover === ci || open); c.el.classList.toggle('away', openIdx >= 0 && !open);
-  });
-  const want = best ? `${best.c}:${best.i}` : null;
-  if (want !== (hot && hot.key)) hot = best ? { ...best, key: want } : null;
-  tA += ((hot ? 1 : 0) - tA) * 0.2;
-  const edgeIn = A < 1 ? clamp((A - 0.45) / 0.55) : 1;
-  invs.forEach((c, ci) => {
-    const f = c.field, N = f.points; const set = hot && hot.c === ci ? chainOf(f, hot.i) : null;
-    ctx.lineWidth = lw; ctx.strokeStyle = ink(C.edge, (0.11 + 0.12 * c.h + 0.16 * c.o) * C.eg * c.dim * edgeIn);
-    ctx.beginPath(); for (const e of f.edges) edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.stroke();
-    for (const e of f.edges) { const fo = (c.F[e.a] + c.F[e.b]) / 2; if (fo < 0.05) continue; ctx.beginPath(); edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.lineWidth = lw * (1 + 1.2 * fo); ctx.strokeStyle = ink(mix(C.edge, C.lit, 0.6 * fo), (0.12 + 0.7 * fo) * c.dim * edgeIn); ctx.stroke(); }
-    if (set) { ctx.lineWidth = 1.5 * Math.pow(kr, 0.3); ctx.strokeStyle = ink(C.trace, 0.85 * tA); ctx.beginPath(); for (const e of f.edges) if (set.has(e.a) && set.has(e.b)) edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.stroke(); }
-    for (let pass = 0; pass < 3; pass++) for (let i = 0; i < N.length; i++) {
-      const n = N[i]; if (n.type !== pass) continue;
-      const inSet = !!set && set.has(i); const fo = inSet ? Math.max(c.F[i], 0.9 * tA) : c.F[i];
-      const X = c.X[i], Y = c.Y[i]; const e = ease(clamp((A - n.dly) / 0.6)); const depth = (n.d - 0.55) / 0.95;
-      const a = (0.3 + 0.55 * depth + (n.type === CLAIM ? 0.12 : 0) + 0.5 * fo + 0.12 * c.h) * C.ng * c.dim * (0.25 + 0.75 * e);
-      const col = n.type === DOC ? C.doc : n.type === PASSAGE ? C.pass : C.claim;
-      const cc = mix(col, inSet ? C.trace : C.lit, n.type === CLAIM && !inSet ? 0.25 * fo : inSet ? 0.35 : 0.85 * fo);
-      const sz = n.d * rScale * (1 + 0.9 * fo) * (0.9 + 0.1 * c.h);
-      if (n.type === DOC) { ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1.4, 2.4 * sz); ctx.strokeStyle = ink(cc, a); ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X + n.len * k * 0.55 * (0.8 + 0.2 * e), Y); ctx.stroke(); }
-      else if (n.type === PASSAGE) { ctx.fillStyle = ink(cc, a); ctx.beginPath(); ctx.arc(X, Y, Math.max(0.9, 1.9 * sz), 0, 6.2832); ctx.fill(); }
-      else { const rr = Math.max(2, 3.5 * sz); ctx.fillStyle = ink(cc, a * 0.35); ctx.beginPath(); ctx.arc(X, Y, rr, 0, 6.2832); ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = ink(cc, a); ctx.stroke(); }
-    }
-    if (K.marks) {
-      const t = 11, ma = (0.2 + 0.55 * c.h + 0.15 * c.o) * c.dim, ox = cellX(ci) + GX, oy = cellY(ci) + GY;
-      const [xa, ya] = toScreen(ox - 6, oy - 6), [xb, yb] = toScreen(ox + GW + 6, oy + GH + 6);
-      ctx.lineWidth = 1; ctx.lineCap = 'butt'; ctx.strokeStyle = ink(mix(C.edge, C.lit, c.h * 0.5), ma); ctx.beginPath();
-      ctx.moveTo(xa, ya + t); ctx.lineTo(xa, ya); ctx.lineTo(xa + t, ya); ctx.moveTo(xb - t, ya); ctx.lineTo(xb, ya); ctx.lineTo(xb, ya + t);
-      ctx.moveTo(xa, yb - t); ctx.lineTo(xa, yb); ctx.lineTo(xa + t, yb); ctx.moveTo(xb - t, yb); ctx.lineTo(xb, yb); ctx.lineTo(xb, yb - t); ctx.stroke();
-    }
-  });
-  if (hot && tA > 0.02) {
-    const c = invs[hot.c], n = c.field.points[hot.i], X = c.X[hot.i], Y = c.Y[hot.i];
-    ctx.lineWidth = 1.4; ctx.strokeStyle = ink(C.trace, tA); ctx.beginPath(); ctx.arc(X, Y, 7 + 3 * n.d * Math.pow(kr, 0.3), 0, 6.2832); ctx.stroke();
-    if (tip.dataset.k !== hot.key) { tip.dataset.k = hot.key; tip.querySelector('small').textContent = ['Document', 'Passage', 'Claim'][n.type]; tip.querySelector('span').textContent = n.name; tip.querySelector('em').textContent = n.type === PASSAGE ? `${figure(n.at)} of ${figure(n.of)}` : ''; }
-    const flip = X > W - 330; tip.style.transform = `translate(${flip ? X - 14 : X + 14}px,${Y - 38}px) translateX(${flip ? '-100%' : '0'})`; tip.style.opacity = tA.toFixed(3);
-  } else tip.style.opacity = '0';
+  for (const [title, said] of [['Ask the agent', 'Claude is ready for questions.'], ['Take the walk', '9 steps, about four minutes.'], ['Signed in as TK', 'Sign out']]) {
+    const w = el('li', 'way-item'); const wa = el('a', null, title); wa.href = '#'; w.append(wa, el('span', null, said)); list.append(w);
+  }
+  document.getElementById('holds').textContent = `This bench holds ${snapshot.length} investigations.`;
+  plates.forEach((P) => P.replay());
 }
 
 // ---------------- wiring ----------------
-stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); fx = e.clientX - r.left; fy = e.clientY - r.top; if (openIdx < 0) { let h = -1; invs.forEach((c, ci) => { const [x0, y0] = toScreen(cellX(ci), cellY(ci)); if (fx >= x0 && fx < x0 + CW * cam.k && fy >= y0 && fy < y0 + (GY + GH + 12) * cam.k) h = ci; }); if (!e.target.closest('.plate')) hover = h; } });
-stage.addEventListener('pointerleave', () => { fx = fy = -1e4; hover = -1; });
-stage.addEventListener('click', (e) => { if (e.target.closest('.plate,.backbtn')) return; if (openIdx < 0 && hover >= 0) dive(hover); });
-document.getElementById('backbtn').onclick = out;
-addEventListener('keydown', (e) => { if (e.key === 'Escape') out(); });
-new ResizeObserver(() => layout(true)).observe(stage);
-
 const knobs = document.getElementById('knobs');
 function syncKnobs() {
-  knobs.querySelectorAll('[data-k]').forEach((el) => { const k = el.dataset.k; const v = K[k] ?? (k === 'edgeGain' ? C.eg : k === 'nodeGain' ? C.ng : k === 'claimHex' ? '#' + C.claim.map((x) => x.toString(16).padStart(2, '0')).join('') : ''); if (el.type === 'checkbox') el.checked = !!v; else el.value = v; const o = el.parentElement.querySelector('output'); if (o) o.textContent = el.type === 'color' ? el.value : (+el.value).toFixed(2).replace(/\.?0+$/, ''); });
+  knobs.querySelectorAll('[data-k]').forEach((e) => { const k = e.dataset.k; const v = K[k] ?? (k === 'edgeGain' ? C.eg : k === 'nodeGain' ? C.ng : k === 'claimHex' ? '#' + C.claim.map((x) => x.toString(16).padStart(2, '0')).join('') : ''); if (e.type === 'checkbox') e.checked = !!v; else e.value = v; const o = e.parentElement.querySelector('output'); if (o) o.textContent = e.type === 'color' ? e.value : (+e.value).toFixed(2).replace(/\.?0+$/, ''); });
 }
-knobs.addEventListener('input', (e) => { const el = e.target; const k = el.dataset.k; if (!k) return; K[k] = el.type === 'checkbox' ? el.checked : el.type === 'color' ? el.value : +el.value; readColors(); if (k === 'scale') build(); syncKnobs(); });
-knobs.querySelectorAll('[data-scheme]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-scheme]').forEach((x) => x.classList.toggle('on', x === b)); press.classList.toggle('dark', b.dataset.scheme === 'dark'); K.edgeGain = K.nodeGain = K.claimHex = null; readColors(); syncKnobs(); });
-knobs.querySelectorAll('[data-cols]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-cols]').forEach((x) => x.classList.toggle('on', x === b)); colsMode = b.dataset.cols; out(); layout(true); });
-document.getElementById('replay').onclick = () => { t0 = performance.now(); };
-document.getElementById('reset').onclick = () => { K = { ...DEFAULTS }; readColors(); build(); syncKnobs(); };
+const redraw = () => plates.forEach((P) => P.schedule());
+knobs.addEventListener('input', (e) => { const t = e.target; const k = t.dataset.k; if (!k) return; K[k] = t.type === 'checkbox' ? t.checked : t.type === 'color' ? t.value : +t.value; readTokens(); if (k === 'scale') build(); else redraw(); syncKnobs(); });
+knobs.querySelectorAll('[data-scheme]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-scheme]').forEach((x) => x.classList.toggle('on', x === b)); press.classList.toggle('dark', b.dataset.scheme === 'dark'); K.edgeGain = K.nodeGain = K.claimHex = null; readTokens(); redraw(); syncKnobs(); });
+knobs.querySelectorAll('[data-width]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-width]').forEach((x) => x.classList.toggle('on', x === b)); const ph = b.dataset.width === 'phone'; document.getElementById('screen').classList.toggle('phone', ph); press.classList.toggle('phone', ph); });
+document.getElementById('replay').onclick = () => plates.forEach((P) => P.replay());
+document.getElementById('reset').onclick = () => { K = { ...DEFAULTS }; readTokens(); build(); syncKnobs(); };
 
 const snapBox = document.getElementById('snap');
 snapBox.value = document.getElementById('snapshot-default').textContent.trim();
-document.getElementById('apply').onclick = () => { try { snapshot = JSON.parse(snapBox.value); document.getElementById('snaperr').textContent = ''; out(); build(); } catch (err) { document.getElementById('snaperr').textContent = String(err.message); } };
-snapshot = JSON.parse(snapBox.value); readColors(); build(); syncKnobs(); requestAnimationFrame(frame);
+document.getElementById('apply').onclick = () => { try { snapshot = JSON.parse(snapBox.value); document.getElementById('snaperr').textContent = ''; build(); } catch (err) { document.getElementById('snaperr').textContent = String(err.message); } };
+snapshot = JSON.parse(snapBox.value); readTokens(); build(); syncKnobs();
 })();
 </script>
 </body></html>

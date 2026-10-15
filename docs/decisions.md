@@ -3,6 +3,26 @@
 Newest first. A decision made in a Claude Design chat or a meeting is recorded here, because those
 are not kept.
 
+## 2026-10-15 — round 2: synced to the Recordbench cuts (decision #250)
+
+Recordbench cut its front-page variants and the Press's single field (Recordbench decision #250,
+`press-page` branch). The cards follow the app; no family token changes.
+
+- **The Press is a page of plates.** Each investigation draws its own plate at rest, in the page's
+  flow: no camera, pan, zoom, dive, open state, focus lens or light pool. Hover traces a chain;
+  the draw-in plays once a session over `--motion-settle` × 2.5. The descent into an investigation
+  is the page change, and the plate grows into the overview's header. `recordbench-press` is
+  re-ported from `PressPlate.svelte`, with `buildField` still verbatim.
+- **Press tokens retired** (not family tokens, so no release): `--press-ink-3`, `--press-shade`,
+  `--press-plate-bg`, `--press-plate-clear`, `--press-toner-solid`, `--press-c-lit`, `--press-pool`,
+  `--press-pool-a`, `--press-grain-*`, `--press-night`, the `--press-k/-p/-arr/-cen` axes, and
+  `--motion-live`. `--rt-press`, `--rt-accent` and `--rt-font-didot` stay.
+- **One front page.** Cards, Desk and Cabinet, the dev design switch and every `--desk-*` token are
+  gone. This settles the bench-design half of the round-1 open call; the four alternate looks are
+  still open.
+- **Bench root:** the find bar, the per-row hues, the PlateArt cards and the Plates dials in settings
+  are gone. The inventory card drops the Cards/Desk/Cabinet row and Cabinet's sub-11px label.
+
 ## 2026-10-15 — v0.2.1
 
 Inter italic now ships beside the upright, so sans italics stop rendering as a slanted imitation of the upright face. The licence path in `family-fonts.css` is also corrected. No token values change.
