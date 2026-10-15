@@ -3,7 +3,8 @@
 // The repo is public and the cards are pulled from Claude Design, where real names creep in;
 // this is the gate that catches them. It reads the two shapes mockups use for an
 // investigation: a numbered list row (<li><span>IV</span><div>Name<small>) and a crumb's
-// current step after a chevron (›</span><span class="on">Name</span>).
+// current step after a chevron (›</span><span class="on">Name</span>), and the
+// "investigation" key of a live card's JSON snapshot.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,6 +14,10 @@ const allowed = new Set(JSON.parse(readFileSync(join(root, 'fixtures.json'), 'ut
 const shapes = [
   /<li><span>[IVXLC]+<\/span><div>([^<]+)<small>/g,
   /›<\/span><span class="on">([^<]+)<\/span>/g,
+  // The investigation crumb in a unified-shell trail (recordbench-pages/gates).
+  /<a href="#" data-inv[^>]*>([^<]+)<\/a>/g,
+  // A live card's snapshot (recordbench-press.html): {"investigation":"Name", …}.
+  /"investigation":\s*"([^"]+)"/g,
 ];
 
 const files = ['index.html', ...readdirSync(join(root, 'cards')).map((f) => join('cards', f))];
