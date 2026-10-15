@@ -1,0 +1,370 @@
+<!-- @dsCard group="Recordbench" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recordbench — the Press (live node field, fixture snapshot)</title>
+<style>
+  :root{
+    /* family tokens (ragtime-design v0.2.1) */
+    --rt-accent:#006a72;--rt-ink:#1d2125;--rt-ink-soft:#4a4f55;--rt-ink-faint:#767a7f;--rt-rule:#d8d4cb;--rt-paper:#f5f3ee;--rt-raised:#fbfaf7;--rt-press:#e8e1cf;
+    --rt-font-ui:Inter,ui-sans-serif,system-ui,sans-serif;--rt-font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    --rt-font-didot:Didot,'Bodoni 72','Bodoni MT','Playfair Display',serif;--rt-font-iowan:'Iowan Old Style',Charter,Georgia,serif;
+    /* press tokens, as shipped in Recordbench app.css */
+    --press-paper:var(--rt-press);--press-paper-edge:#d9d0b8;--press-ink:#15130f;--press-ink-2:#4b4639;--press-ink-3:#7d7665;--press-plate:var(--rt-accent);
+    --press-hair:#15130f47;--press-shade:#15130f47;
+    --press-c-doc:21,19,15;--press-c-pass:21,19,15;--press-c-claim:0,106,114;--press-c-edge:21,19,15;--press-c-lit:21,19,15;--press-c-trace:0,106,114;
+    --press-pool:255,251,238;--press-pool-a:.55;--press-edge-gain:1.9;--press-node-gain:1.3;--press-night:0;
+  }
+  .dark{
+    --rt-accent:#6cc0bf;--rt-press:#131416;
+    --press-paper-edge:#0c0d0e;--press-ink:#ece4d0;--press-ink-2:#b6af9c;--press-ink-3:#847e6e;--press-hair:#ece4d042;--press-shade:#0009;
+    --press-c-doc:150,146,132;--press-c-pass:190,184,166;--press-c-claim:108,192,191;--press-c-edge:160,155,140;--press-c-lit:255,243,214;--press-c-trace:108,192,191;
+    --press-pool:255,224,164;--press-pool-a:.14;--press-edge-gain:1.15;--press-node-gain:1;--press-night:1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--rt-paper);color:var(--rt-ink);font:14px/1.5 var(--rt-font-ui)}
+  a{color:var(--rt-accent)}.back-ix{display:inline-block;font-size:12px;margin-bottom:14px}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede0{color:var(--rt-ink-soft);font-size:12.5px;margin:0 0 18px;max-width:86ch}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--rt-ink-faint);font-weight:650;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rt-rule)}
+  code{font:12px var(--rt-font-mono)}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--rt-accent);color:var(--rt-accent);border-radius:3px;margin-left:6px;vertical-align:2px}
+  .wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:start}
+
+  /* ---------- the screen ---------- */
+  .screen{border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .press{position:relative;color:var(--press-ink);background:radial-gradient(120% 90% at 50% 40%,transparent 55%,var(--press-paper-edge) 130%),var(--press-paper)}
+  .mast .title{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:40px;align-items:end;padding:22px 24px 18px;border-bottom:4px double var(--press-ink)}
+  .mast h3{margin:0;font:700 44px/.8 var(--rt-font-didot);letter-spacing:-.045em;text-shadow:1.6px 1px 0 var(--press-plate)}
+  .mast p{margin:0;font:13px/1.4 var(--rt-font-iowan)}.mast p span+span{margin-left:.4em;color:var(--press-ink-2)}
+  .cluster{display:flex;align-items:center;gap:14px;margin-bottom:2px}
+  .ico{width:30px;height:30px;display:grid;place-items:center;color:var(--press-ink-2);position:relative}
+  .ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .ico.bot{color:var(--press-plate)}.ico.bot b{position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#1f6b45;border:2px solid var(--press-paper)}
+  .av{width:30px;height:30px;border-radius:50%;background:var(--press-ink);color:var(--press-paper);font:600 11px/30px var(--rt-font-ui);text-align:center}
+  .backbtn{position:absolute;z-index:20;top:12px;left:12px;font:600 12px var(--rt-font-ui);border:1px solid var(--press-ink);background:var(--press-paper);color:var(--press-ink);padding:6px 10px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
+  .press.open .backbtn{opacity:1;pointer-events:auto}
+  .stage{position:relative;width:100%;user-select:none}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+  /* plates: the row labels under each field */
+  .plate{position:absolute;top:0;left:0;z-index:5;padding:7px 10px 9px 8px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s,opacity .2s}
+  .plate.show{background:color-mix(in srgb,var(--press-paper) 97%,transparent);border-color:var(--press-ink);box-shadow:4px 5px 0 -1px var(--press-hair),0 14px 30px -12px var(--press-shade)}
+  .plate.away{opacity:0;pointer-events:none}
+  .hd{display:flex;gap:8px;align-items:flex-start}
+  .num{min-width:46px;padding-top:3px;font:700 42px/.8 var(--rt-font-didot);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px var(--press-plate);transition:color .2s}
+  .plate.show .num{color:var(--press-plate)}
+  .ttl{padding-top:2px;font:700 19px/1.06 var(--rt-font-didot);letter-spacing:-.015em;text-shadow:1.5px 1px 0 var(--press-plate)}
+  .plate.show .ttl{text-shadow:none}
+  .cnt{display:block;margin:4px 0 0 54px;font:11px var(--rt-font-mono);color:var(--press-ink-3)}
+  .cnt b{font-weight:600;color:var(--press-ink-2)}
+  .q{display:block;margin:6px 0 0 54px;font:13px/1.35 var(--rt-font-iowan);color:var(--press-ink-2);max-height:0;overflow:hidden;opacity:0;transition:max-height .25s,opacity .25s}
+  .plate.show .q{max-height:80px;opacity:1}
+  .enter{display:none;margin:8px 0 0 54px;font:600 12px var(--rt-font-ui);color:var(--press-plate)}
+  .press.open .plate.show .enter{display:inline-block}
+  /* wide: on hover the question takes a column to the right of the title, so the plate grows sideways, never down */
+  .plate.wide.show{display:grid;grid-template-columns:44% minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:4px}
+  .plate.wide.show .hd{grid-area:1/1}.plate.wide.show .cnt{grid-area:2/1}
+  .plate.wide.show .q{grid-area:1/2/3/3;margin:2px 0 0 10px}
+  .plate.wide.show .enter{grid-column:1/-1}
+  .tip{position:absolute;z-index:30;top:0;left:0;pointer-events:none;opacity:0;background:var(--press-paper);border:1px solid var(--press-ink);padding:5px 8px;max-width:300px;box-shadow:3px 4px 0 -1px var(--press-hair)}
+  .tip small{display:block;font:600 11px var(--rt-font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--press-plate)}
+  .tip span{display:block;font:13px/1.3 var(--rt-font-iowan)}
+  .tip em{display:block;font:11px var(--rt-font-mono);font-style:normal;color:var(--press-ink-3)}
+
+  /* ---------- knobs ---------- */
+  .knobs{position:sticky;top:16px;background:var(--rt-raised);border:1px solid var(--rt-rule);border-radius:3px;padding:12px 14px;font-size:12px}
+  .knobs h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--rt-ink-faint)}
+  .knobs label{display:grid;grid-template-columns:1fr 46px;gap:2px 8px;align-items:center;margin:0 0 9px;color:var(--rt-ink-soft)}
+  .knobs label input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--rt-accent)}
+  .knobs output{font:11px var(--rt-font-mono);text-align:right;color:var(--rt-ink)}
+  .knobs .row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+  .knobs button{font:500 12px var(--rt-font-ui);padding:4px 9px;border:1px solid var(--rt-rule);background:var(--rt-paper);color:var(--rt-ink);border-radius:3px;cursor:pointer}
+  .knobs button.on{background:var(--rt-ink);color:var(--rt-paper);border-color:var(--rt-ink)}
+  .knobs hr{border:0;border-top:1px solid var(--rt-rule);margin:10px 0}
+  textarea{width:100%;height:220px;font:11px/1.4 var(--rt-font-mono);border:1px solid var(--rt-rule);background:var(--rt-raised);padding:8px;border-radius:3px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--rt-ink-soft);margin:10px 0 0}
+  .legend i{display:inline-block;vertical-align:middle;margin-right:6px}
+  .notes{font-size:12.5px;color:var(--rt-ink-soft);max-width:86ch}.notes li{margin:3px 0}
+</style></head>
+<body>
+<a class="back-ix" href="../index.html">← Index</a>
+<h1>Recordbench — the Press <span class="tag">live · fixture snapshot</span></h1>
+<p class="lede0">The front page as shipped (decision #241, <code>Press.svelte</code> + <code>lib/press.ts</code> at <code>origin/main</code> 977a820), re-implemented here on a plain canvas so it can be iterated in Claude Design. Each investigation is a field: <b>documents</b> are bars on the left, <b>passages</b> are dots, <b>claims</b> are rings on the right, and curves join a document through its passages to the claims they support. A claim built on another claim gets its own curve, which loops out to the right. The field layout is the shipped <code>buildField</code>, verbatim. Hover a point to trace its chain; click a field or its plate to dive in; Esc or Back to come out. The data is a fake snapshot (edit it below) in the API's <code>Constellation</code> shape. Investigation names come from <code>fixtures.json</code>.</p>
+
+<div class="wrap">
+<div>
+  <div class="screen"><div class="press" id="press">
+    <header class="mast"><div class="title">
+      <h3>recordbench</h3>
+      <p><span>Recordbench keeps the record of an investigation. It keeps every source, quoted passage, claim, and review, and it says who did what and when.</span><span>Read what this tool is, and what the record promises.</span><span id="holds"></span></p>
+      <div class="cluster"><div class="ico bot" title="Agent connected"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></div><div class="ico" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div><div class="av">TK</div></div>
+    </div></header>
+    <div class="stage" id="stage"><button class="backbtn" id="backbtn">← Back to the bench</button><canvas id="cv"></canvas><div class="tip" id="tip"><small></small><span></span><em></em></div></div>
+  </div></div>
+  <div class="legend">
+    <span><i style="width:22px;height:3px;border-radius:2px;background:#15130f"></i>Document (bar length ∝ √ text length)</span>
+    <span><i style="width:5px;height:5px;border-radius:50%;background:#15130f"></i>Passage</span>
+    <span><i style="width:9px;height:9px;border-radius:50%;border:1.2px solid #006a72;background:#006a7259"></i>Claim</span>
+    <span><i style="width:22px;height:0;border-top:1.4px solid #006a72"></i>Traced chain (hover)</span>
+  </div>
+</div>
+
+<aside class="knobs" id="knobs">
+  <h4>Scheme</h4>
+  <div class="row"><button data-scheme="light" class="on">Light</button><button data-scheme="dark">Dark</button></div>
+  <h4>Columns</h4>
+  <div class="row"><button data-cols="auto" class="on">Auto</button><button data-cols="1">1</button><button data-cols="2">2</button></div>
+  <hr>
+  <h4>Ink</h4>
+  <label>Edge gain <output></output><input type="range" data-k="edgeGain" min="0" max="4" step=".05"></label>
+  <label>Node gain <output></output><input type="range" data-k="nodeGain" min="0" max="3" step=".05"></label>
+  <label>Point size <output></output><input type="range" data-k="size" min=".4" max="2.5" step=".05"></label>
+  <label>Claim colour <output></output><input type="color" data-k="claimHex" style="grid-column:1/-1;width:100%;height:24px;border:0;padding:0;background:none"></label>
+  <hr>
+  <h4>Motion</h4>
+  <label>Focus lens radius <output></output><input type="range" data-k="lensR" min="0" max="300" step="5"></label>
+  <label>Lens push (px) <output></output><input type="range" data-k="lensPush" min="0" max="20" step=".5"></label>
+  <label>Arrival (s) <output></output><input type="range" data-k="arrival" min="0" max="4" step=".1"></label>
+  <label>Camera settle <output></output><input type="range" data-k="settle" min=".02" max=".4" step=".01"></label>
+  <hr>
+  <h4>Sampling</h4>
+  <label>Record size × <output></output><input type="range" data-k="scale" min=".1" max="6" step=".1"></label>
+  <label style="grid-template-columns:1fr auto"><span>Register marks</span><input type="checkbox" data-k="marks"></label>
+  <div class="row"><button id="replay">Replay arrival</button><button id="reset">Reset knobs</button></div>
+</aside>
+</div>
+
+<h2>The snapshot</h2>
+<p class="notes">Five fixture investigations. Each entry gives the plate's words and the record's totals; <code>constellation</code> is either generated from <code>seed</code> and <code>shape</code> (below) or given literally in the API's shape (<code>documents[{name,length,marks_total,marks[{start,claims[]}]}]</code>, <code>claims[{name,rests_on[]}]</code>, <code>totals</code>). Paste a literal constellation into any entry to see real shape. Edit, then <b>Apply</b>.</p>
+<textarea id="snap"></textarea>
+<div class="row" style="margin-top:8px;display:flex;gap:8px"><button id="apply" style="font:500 12px var(--rt-font-ui);padding:5px 12px;border:1px solid var(--rt-accent);background:var(--rt-accent);color:#fff;border-radius:3px;cursor:pointer">Apply snapshot</button><span id="snaperr" style="color:#a3231f;font-size:12px"></span></div>
+
+<h2>What to iterate on</h2>
+<ul class="notes">
+  <li><b>Plate type.</b> Didot titles with a misregistered teal shadow, outlined numerals that fill on hover. The plate is the only Didot in the app besides the masthead.</li>
+  <li><b>Ink balance.</b> Shipped gains are 1.9 (edges) and 1.3 (nodes) in light, 1.15 and 1 in dark. Claims are the one coloured mark; everything else is press ink.</li>
+  <li><b>Phone.</b> Below 640px the stage is not mounted at all (owner, 2026-10-15): the plates become a plain numbered list. See the Recordbench shell card, Proposal C.</li>
+  <li><b>Not ported:</b> paper grain bitmap, depth parallax while panning, the press-down plate inset, drag to pan when dived, the edge bitmap cache. Each is a performance or texture detail, not layout.</li>
+</ul>
+
+<script type="application/json" id="snapshot-default">
+[
+  {"investigation":"Agency rule changes","lead":"Which rules changed without notice and comment, and what did the agencies say about why?","totals":{"documents":214,"marks":620,"claims":61},"seed":"agency","shape":{"restsOn":0.25,"skew":1.4}},
+  {"investigation":"Grant terminations","lead":"Which grants were ended, by whom, and on what stated ground?","totals":{"documents":82,"marks":240,"claims":19},"seed":"grants","shape":{"restsOn":0.15,"skew":1.0}},
+  {"investigation":"Court filings review","lead":"What do the filings say the government did, and what did the court find?","totals":{"documents":40,"marks":180,"claims":12},"seed":"court","shape":{"restsOn":0.35,"skew":2.2}},
+  {"investigation":"Public statements","lead":"What did officials say in public, and does the record bear it out?","totals":{"documents":33,"marks":64,"claims":0},"seed":"statements","shape":{"restsOn":0,"skew":0.8}},
+  {"investigation":"Sanctions designations","lead":"Which designations rest on public evidence, and which on none?","totals":{"documents":120,"marks":410,"claims":38},"seed":"sanctions","shape":{"restsOn":0.2,"skew":1.6}}
+]
+</script>
+
+<script>
+(() => {
+// ---------------- lib/press.ts, verbatim in substance ----------------
+const FIELD = { w: 600, h: 214 }; const DOC = 0, PASSAGE = 1, CLAIM = 2;
+const figure = (n) => n.toLocaleString('en-US');
+function caps(t) { return { docs: Math.round(4 + Math.sqrt(t.documents) * 0.75), passages: Math.round(6 + Math.sqrt(t.marks) * 1.9), claims: Math.round(3 + Math.sqrt(t.claims) * 1.3) }; }
+function rng(seed) { let s = seed | 0; return () => { s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function hash(text) { let h = 2166136261; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619); return h | 0; }
+function buildField(con, seed) {
+  if (!con || con.documents.length === 0) return { points: [], edges: [], adj: [] };
+  const r = rng(hash(seed)); const cap = caps(con.totals); const GW = FIELD.w, GH = FIELD.h;
+  const docOrder = con.documents.map((doc, index) => ({ doc, index })).sort((a, b) => b.doc.marks_total - a.doc.marks_total || a.index - b.index).slice(0, cap.docs).sort((a, b) => a.index - b.index);
+  const nD = docOrder.length; const quota = Math.max(1, Math.ceil(cap.passages / nD));
+  const points = [], edges = [];
+  const make = (type, x, y, extra) => { points.push({ type, x, y, d: 0.55 + r() * 0.95, len: 0, name: '', at: 0, of: 0, dly: 0.3 * r(), sx: GW / 2 + (r() - 0.5) * 1100, sy: GH / 2 + (r() - 0.5) * 700, ...extra }); return points.length - 1; };
+  const longest = Math.max(1, ...docOrder.map(({ doc }) => doc.length ?? doc.marks_total * 400));
+  const docAt = [];
+  docOrder.forEach(({ doc }, i) => { const size = doc.length ?? doc.marks_total * 400; const len = 10 + 30 * Math.sqrt(size / longest); docAt.push(make(DOC, 6 + r() * 14, 10 + ((GH - 20) * (i + 0.5)) / nD, { len, name: doc.name })); });
+  const chosen = [];
+  docOrder.forEach(({ doc }, di) => { doc.marks.map((mark, rank) => ({ mark, rank })).sort((a, b) => b.mark.claims.length - a.mark.claims.length || a.rank - b.rank).slice(0, quota).sort((a, b) => a.rank - b.rank).forEach(({ rank }) => chosen.push({ doc: di, mark: rank, rank })); });
+  const picked = chosen.slice(0, Math.max(cap.passages, nD));
+  const claimIdx = new Map(); const wanted = [];
+  for (const { doc, mark } of picked) for (const c of docOrder[doc].doc.marks[mark].claims) if (!wanted.includes(c) && wanted.length < cap.claims) wanted.push(c);
+  const passages = [];
+  for (const { doc, mark, rank } of picked) {
+    const owner = docOrder[doc].doc; const m = owner.marks[mark];
+    const span = owner.length && owner.length > 0 ? m.start / owner.length : r();
+    const dy = points[docAt[doc]].y;
+    const index = make(PASSAGE, 150 + Math.min(1, Math.max(0, span)) * 300 + r() * 70, Math.min(GH - 6, Math.max(6, dy + (r() - 0.5) * 70)), { name: owner.name, at: rank + 1, of: Math.max(owner.marks_total, rank + 1) });
+    edges.push({ a: docAt[doc], b: index, rest: false });
+    passages.push({ index, doc, claims: m.claims.filter((c) => wanted.includes(c)) });
+  }
+  const meanY = (c) => { const ys = passages.filter((p) => p.claims.includes(c)).map((p) => points[p.index].y); return ys.length === 0 ? GH / 2 : ys.reduce((s, y) => s + y, 0) / ys.length; };
+  const ordered = [...wanted].sort((a, b) => meanY(a) - meanY(b));
+  ordered.forEach((c, i) => claimIdx.set(c, make(CLAIM, 520 + r() * 74, 8 + ((GH - 16) * (i + 0.5)) / ordered.length, { name: con.claims[c].name })));
+  for (const p of passages) for (const c of p.claims) edges.push({ a: p.index, b: claimIdx.get(c), rest: false });
+  for (const c of ordered) for (const from of con.claims[c].rests_on ?? []) { const a = claimIdx.get(from), b = claimIdx.get(c); if (a !== undefined && b !== undefined && a !== b) edges.push({ a, b, rest: true }); }
+  const adj = points.map(() => []); for (const { a, b } of edges) { adj[a].push(b); adj[b].push(a); }
+  return { points, edges, adj };
+}
+function chainOf(f, i) { const set = new Set([i]); const type = f.points[i].type; for (const a of f.adj[i]) { set.add(a); if (type === PASSAGE) continue; for (const b of f.adj[a]) { const t = f.points[b].type; if (type === DOC ? t === CLAIM : t === DOC) set.add(b); } } return set; }
+
+// ---------------- fake constellations ----------------
+const DOC_WORDS = ['Notice of proposed rule', 'Final rule', 'Interim final rule', 'Agency memorandum', 'Press release', 'Termination letter', 'Complaint', 'Motion to dismiss', 'Declaration', 'Order', 'Transcript', 'Guidance document', 'Federal Register notice', 'Inspector general report', 'Letter to Congress'];
+const CLAIM_WORDS = ['The change took effect before any notice', 'The stated ground was not in the statute', 'No comment period was offered', 'The agency later withdrew the reason it gave', 'The decision predates the memo that justifies it', 'Two offices gave different reasons', 'The court found the record incomplete', 'The same text appears in three letters', 'The action reversed a prior written position', 'Funds were obligated before the decision', 'The official named no legal authority', 'The record holds no analysis of cost'];
+function fakeConstellation(entry, scale) {
+  const r = rng(hash(entry.seed || entry.investigation)); const sh = entry.shape || {};
+  const T = { documents: Math.max(1, Math.round(entry.totals.documents * scale)), marks: Math.round(entry.totals.marks * scale), claims: Math.round(entry.totals.claims * scale) };
+  const nDocs = Math.min(T.documents, 80), nClaims = Math.min(T.claims, 60);
+  const claims = []; for (let i = 0; i < nClaims; i++) claims.push({ name: CLAIM_WORDS[i % CLAIM_WORDS.length] + (i >= CLAIM_WORDS.length ? ` (${Math.floor(i / CLAIM_WORDS.length) + 1})` : ''), rests_on: [] });
+  for (let i = 1; i < nClaims; i++) if (r() < (sh.restsOn ?? 0.2)) claims[i].rests_on.push(Math.floor(r() * i));
+  const per = T.marks / nDocs; const docs = [];
+  for (let i = 0; i < nDocs; i++) {
+    const weight = Math.pow(r(), sh.skew ?? 1.2) * 2; const n = Math.max(0, Math.round(per * weight)); const length = Math.round(2000 + r() * 60000 * (0.3 + weight));
+    const marks = []; for (let j = 0; j < Math.min(n, 30); j++) { const c = []; if (nClaims && r() < 0.55) c.push(Math.floor(Math.pow(r(), 1.3) * nClaims)); if (nClaims && r() < 0.12) c.push(Math.floor(r() * nClaims)); marks.push({ start: Math.round(r() * length), claims: [...new Set(c)] }); }
+    marks.sort((a, b) => a.start - b.start);
+    docs.push({ name: `${DOC_WORDS[Math.floor(r() * DOC_WORDS.length)]}, ${2024 + Math.floor(r() * 2)}-${String(1 + Math.floor(r() * 9000)).padStart(4, '0')}`, length, marks_total: n, marks });
+  }
+  return { documents: docs, claims, totals: { ...T, without_text: 0 } };
+}
+
+// ---------------- the engine (simplified Press.svelte) ----------------
+const DEFAULTS = { edgeGain: null, nodeGain: null, size: 1, claimHex: null, lensR: 150, lensPush: 7, arrival: 1.4, settle: 0.14, scale: 1, marks: true };
+let K = { ...DEFAULTS }, colsMode = 'auto';
+const press = document.getElementById('press'), stage = document.getElementById('stage'), cv = document.getElementById('cv'), ctx = cv.getContext('2d'), tip = document.getElementById('tip');
+const CW = 640, GX = 20, GY = 8, GW = FIELD.w, GH = FIELD.h; let BAND = 92;
+let snapshot = [], invs = [], W = 0, H = 0, dpr = 1, cols = 2, kHome = 1, CH = 0;
+const cam = { x: 0, y: 0, k: 1 }, tgt = { x: 0, y: 0, k: 1 }, home = { x: 0, y: 0, k: 1 };
+let openIdx = -1, hover = -1, hot = null, fx = -1e4, fy = -1e4, focus = 0, tA = 0, t0 = performance.now(), C = {};
+const cellX = (i) => (i % cols) * CW, cellY = (i) => Math.floor(i / cols) * CH;
+const tok = (n) => getComputedStyle(press).getPropertyValue(n).trim();
+const trip = (n) => tok(n).split(',').map(Number);
+const hexTrip = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const ink = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0, Math.min(1, a))})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const clamp = (v) => Math.max(0, Math.min(1, v));
+const ease = (t) => 1 - Math.pow(1 - t, 3);
+function readColors() {
+  C = { doc: trip('--press-c-doc'), pass: trip('--press-c-pass'), claim: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-claim'), edge: trip('--press-c-edge'), lit: trip('--press-c-lit'), trace: K.claimHex ? hexTrip(K.claimHex) : trip('--press-c-trace'), pool: trip('--press-pool'), poolA: parseFloat(tok('--press-pool-a')), eg: K.edgeGain ?? parseFloat(tok('--press-edge-gain')), ng: K.nodeGain ?? parseFloat(tok('--press-node-gain')) };
+}
+function build() {
+  stage.querySelectorAll('.plate').forEach((p) => p.remove());
+  invs = snapshot.map((entry, i) => {
+    const con = entry.constellation || fakeConstellation(entry, K.scale);
+    const field = buildField(con, entry.seed || entry.investigation);
+    const el = document.createElement('div'); el.className = 'plate';
+    const t = con.totals;
+    el.innerHTML = `<span class="hd"><span class="num">${String(i + 1).padStart(2, '0')}</span><span class="ttl"></span></span><span class="cnt"><b>${figure(t.documents)}</b> documents, <b>${figure(t.marks)}</b> passages, <b>${figure(t.claims)}</b> claims</span><span class="q"></span><span class="enter">Open this investigation →</span>`;
+    el.querySelector('.ttl').textContent = entry.investigation; el.querySelector('.q').textContent = entry.lead || '';
+    el.addEventListener('mouseenter', () => { hover = i; }); el.addEventListener('mouseleave', () => { if (hover === i) hover = -1; });
+    el.addEventListener('click', () => (openIdx === i ? null : dive(i)));
+    stage.appendChild(el);
+    return { entry, field, el, X: [], Y: [], F: [], h: 0 };
+  });
+  document.getElementById('holds').textContent = `This bench holds ${invs.length} investigations.`;
+  layout(true); t0 = performance.now();
+}
+function layout(snap) {
+  W = stage.clientWidth; dpr = Math.min(1.5, devicePixelRatio || 1);
+  cols = colsMode === 'auto' ? (W < 760 || invs.length === 1 ? 1 : 2) : +colsMode;
+  kHome = Math.min((W - 48) / (cols * CW), 1.25);
+  BAND = 92 / kHome * 0.9; CH = GY + GH + BAND;
+  H = Math.ceil(Math.ceil(invs.length / cols) * CH * kHome + 20);
+  stage.style.height = H + 'px'; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  home.x = (cols * CW) / 2; home.y = (Math.ceil(invs.length / cols) * CH) / 2; home.k = kHome;
+  if (openIdx >= 0) dive(openIdx, snap); else { Object.assign(tgt, home); if (snap) Object.assign(cam, home); }
+}
+function dive(i, snap) {
+  openIdx = i; const kOpen = Math.max(kHome * 1.15, Math.min((W - 80) / GW, (H - 140) / GH));
+  tgt.k = kOpen; tgt.x = cellX(i) + GX + GW / 2; tgt.y = cellY(i) + GY + GH / 2 + (H / 2 - (40 + GH * kOpen / 2)) / kOpen;
+  if (snap) Object.assign(cam, tgt); press.classList.add('open');
+}
+function out() { openIdx = -1; Object.assign(tgt, home); press.classList.remove('open'); }
+function toScreen(wx, wy) { return [(wx - cam.x) * cam.k + W / 2, (wy - cam.y) * cam.k + H / 2]; }
+function edgePath(X, Y, a, b, rest) { const x0 = X[a], y0 = Y[a], x1 = X[b], y1 = Y[b]; ctx.moveTo(x0, y0); if (rest) { const bx = Math.max(x0, x1) + 26 + Math.abs(y1 - y0) * 0.15; ctx.bezierCurveTo(bx, y0, bx, y1, x1, y1); } else { const mx = (x0 + x1) / 2; ctx.bezierCurveTo(mx, y0, mx, y1, x1, y1); } }
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const s = K.settle; cam.x += (tgt.x - cam.x) * s; cam.y += (tgt.y - cam.y) * s; cam.k *= Math.pow(tgt.k / cam.k, s);
+  const A = K.arrival > 0 ? Math.min(1, (now - t0) / 1000 / K.arrival) : 1;
+  const inside = fx > -1e3; focus += ((inside ? 1 : 0) - focus) * 0.15;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  const k = cam.k, kr = k / kHome, rScale = Math.pow(kr, 0.55) * K.size, lw = 0.7 * Math.pow(kr, 0.45);
+  if (focus > 0.01) { const g = ctx.createRadialGradient(fx, fy, 0, fx, fy, 300); g.addColorStop(0, ink(C.pool, C.poolA * focus)); g.addColorStop(1, ink(C.pool, 0)); ctx.fillStyle = g; ctx.fillRect(fx - 300, fy - 300, 600, 600); }
+  let best = null, bestD = 1e9;
+  invs.forEach((c, ci) => {
+    c.h += ((hover === ci ? 1 : 0) - c.h) * 0.18;
+    const ox = cellX(ci) + GX, oy = cellY(ci) + GY, N = c.field.points, open = openIdx === ci;
+    c.o = open ? Math.min(1, (kr - 1) / 0.3) : 0;
+    c.dim = openIdx >= 0 && !open ? 0.15 : 1;
+    const sc = 1 + 0.02 * c.h;
+    for (let i = 0; i < N.length; i++) {
+      const n = N[i]; const e = ease(clamp((A - n.dly) / 0.6));
+      const lx = n.sx + (n.x - n.sx) * e, ly = n.sy + (n.y - n.sy) * e;
+      let [X, Y] = toScreen(ox + GW / 2 + (lx - GW / 2) * sc, oy + GH / 2 + (ly - GH / 2) * sc);
+      const dx = X - fx, dy = Y - fy, d = Math.hypot(dx, dy) || 1;
+      if (c.dim === 1 && d < 11 + 17 * (1 - c.o) && d < bestD) { bestD = d; best = { c: ci, i }; }
+      const fo = K.lensR > 0 ? focus * Math.pow(Math.max(0, 1 - d / K.lensR), 2) : 0;
+      X += (dx / d) * fo * K.lensPush; Y += (dy / d) * fo * K.lensPush;
+      c.X[i] = X; c.Y[i] = Y; c.F[i] = fo;
+    }
+    // plate under the field
+    const fw = Math.min(GW * k, W - 24);
+    const [px] = toScreen(ox, 0); const [, py] = toScreen(0, oy + GH);
+    c.el.style.width = fw + 'px'; c.el.classList.toggle('wide', fw >= 520); c.el.style.transform = `translate(${Math.max(12, Math.min(px, W - fw - 12))}px,${py + 10}px)`;
+    c.el.classList.toggle('show', hover === ci || open); c.el.classList.toggle('away', openIdx >= 0 && !open);
+  });
+  const want = best ? `${best.c}:${best.i}` : null;
+  if (want !== (hot && hot.key)) hot = best ? { ...best, key: want } : null;
+  tA += ((hot ? 1 : 0) - tA) * 0.2;
+  const edgeIn = A < 1 ? clamp((A - 0.45) / 0.55) : 1;
+  invs.forEach((c, ci) => {
+    const f = c.field, N = f.points; const set = hot && hot.c === ci ? chainOf(f, hot.i) : null;
+    ctx.lineWidth = lw; ctx.strokeStyle = ink(C.edge, (0.11 + 0.12 * c.h + 0.16 * c.o) * C.eg * c.dim * edgeIn);
+    ctx.beginPath(); for (const e of f.edges) edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.stroke();
+    for (const e of f.edges) { const fo = (c.F[e.a] + c.F[e.b]) / 2; if (fo < 0.05) continue; ctx.beginPath(); edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.lineWidth = lw * (1 + 1.2 * fo); ctx.strokeStyle = ink(mix(C.edge, C.lit, 0.6 * fo), (0.12 + 0.7 * fo) * c.dim * edgeIn); ctx.stroke(); }
+    if (set) { ctx.lineWidth = 1.5 * Math.pow(kr, 0.3); ctx.strokeStyle = ink(C.trace, 0.85 * tA); ctx.beginPath(); for (const e of f.edges) if (set.has(e.a) && set.has(e.b)) edgePath(c.X, c.Y, e.a, e.b, e.rest); ctx.stroke(); }
+    for (let pass = 0; pass < 3; pass++) for (let i = 0; i < N.length; i++) {
+      const n = N[i]; if (n.type !== pass) continue;
+      const inSet = !!set && set.has(i); const fo = inSet ? Math.max(c.F[i], 0.9 * tA) : c.F[i];
+      const X = c.X[i], Y = c.Y[i]; const e = ease(clamp((A - n.dly) / 0.6)); const depth = (n.d - 0.55) / 0.95;
+      const a = (0.3 + 0.55 * depth + (n.type === CLAIM ? 0.12 : 0) + 0.5 * fo + 0.12 * c.h) * C.ng * c.dim * (0.25 + 0.75 * e);
+      const col = n.type === DOC ? C.doc : n.type === PASSAGE ? C.pass : C.claim;
+      const cc = mix(col, inSet ? C.trace : C.lit, n.type === CLAIM && !inSet ? 0.25 * fo : inSet ? 0.35 : 0.85 * fo);
+      const sz = n.d * rScale * (1 + 0.9 * fo) * (0.9 + 0.1 * c.h);
+      if (n.type === DOC) { ctx.lineCap = 'round'; ctx.lineWidth = Math.max(1.4, 2.4 * sz); ctx.strokeStyle = ink(cc, a); ctx.beginPath(); ctx.moveTo(X, Y); ctx.lineTo(X + n.len * k * 0.55 * (0.8 + 0.2 * e), Y); ctx.stroke(); }
+      else if (n.type === PASSAGE) { ctx.fillStyle = ink(cc, a); ctx.beginPath(); ctx.arc(X, Y, Math.max(0.9, 1.9 * sz), 0, 6.2832); ctx.fill(); }
+      else { const rr = Math.max(2, 3.5 * sz); ctx.fillStyle = ink(cc, a * 0.35); ctx.beginPath(); ctx.arc(X, Y, rr, 0, 6.2832); ctx.fill(); ctx.lineWidth = 1.2; ctx.strokeStyle = ink(cc, a); ctx.stroke(); }
+    }
+    if (K.marks) {
+      const t = 11, ma = (0.2 + 0.55 * c.h + 0.15 * c.o) * c.dim, ox = cellX(ci) + GX, oy = cellY(ci) + GY;
+      const [xa, ya] = toScreen(ox - 6, oy - 6), [xb, yb] = toScreen(ox + GW + 6, oy + GH + 6);
+      ctx.lineWidth = 1; ctx.lineCap = 'butt'; ctx.strokeStyle = ink(mix(C.edge, C.lit, c.h * 0.5), ma); ctx.beginPath();
+      ctx.moveTo(xa, ya + t); ctx.lineTo(xa, ya); ctx.lineTo(xa + t, ya); ctx.moveTo(xb - t, ya); ctx.lineTo(xb, ya); ctx.lineTo(xb, ya + t);
+      ctx.moveTo(xa, yb - t); ctx.lineTo(xa, yb); ctx.lineTo(xa + t, yb); ctx.moveTo(xb - t, yb); ctx.lineTo(xb, yb); ctx.lineTo(xb, yb - t); ctx.stroke();
+    }
+  });
+  if (hot && tA > 0.02) {
+    const c = invs[hot.c], n = c.field.points[hot.i], X = c.X[hot.i], Y = c.Y[hot.i];
+    ctx.lineWidth = 1.4; ctx.strokeStyle = ink(C.trace, tA); ctx.beginPath(); ctx.arc(X, Y, 7 + 3 * n.d * Math.pow(kr, 0.3), 0, 6.2832); ctx.stroke();
+    if (tip.dataset.k !== hot.key) { tip.dataset.k = hot.key; tip.querySelector('small').textContent = ['Document', 'Passage', 'Claim'][n.type]; tip.querySelector('span').textContent = n.name; tip.querySelector('em').textContent = n.type === PASSAGE ? `${figure(n.at)} of ${figure(n.of)}` : ''; }
+    const flip = X > W - 330; tip.style.transform = `translate(${flip ? X - 14 : X + 14}px,${Y - 38}px) translateX(${flip ? '-100%' : '0'})`; tip.style.opacity = tA.toFixed(3);
+  } else tip.style.opacity = '0';
+}
+
+// ---------------- wiring ----------------
+stage.addEventListener('pointermove', (e) => { const r = stage.getBoundingClientRect(); fx = e.clientX - r.left; fy = e.clientY - r.top; if (openIdx < 0) { let h = -1; invs.forEach((c, ci) => { const [x0, y0] = toScreen(cellX(ci), cellY(ci)); if (fx >= x0 && fx < x0 + CW * cam.k && fy >= y0 && fy < y0 + (GY + GH + 12) * cam.k) h = ci; }); if (!e.target.closest('.plate')) hover = h; } });
+stage.addEventListener('pointerleave', () => { fx = fy = -1e4; hover = -1; });
+stage.addEventListener('click', (e) => { if (e.target.closest('.plate,.backbtn')) return; if (openIdx < 0 && hover >= 0) dive(hover); });
+document.getElementById('backbtn').onclick = out;
+addEventListener('keydown', (e) => { if (e.key === 'Escape') out(); });
+new ResizeObserver(() => layout(true)).observe(stage);
+
+const knobs = document.getElementById('knobs');
+function syncKnobs() {
+  knobs.querySelectorAll('[data-k]').forEach((el) => { const k = el.dataset.k; const v = K[k] ?? (k === 'edgeGain' ? C.eg : k === 'nodeGain' ? C.ng : k === 'claimHex' ? '#' + C.claim.map((x) => x.toString(16).padStart(2, '0')).join('') : ''); if (el.type === 'checkbox') el.checked = !!v; else el.value = v; const o = el.parentElement.querySelector('output'); if (o) o.textContent = el.type === 'color' ? el.value : (+el.value).toFixed(2).replace(/\.?0+$/, ''); });
+}
+knobs.addEventListener('input', (e) => { const el = e.target; const k = el.dataset.k; if (!k) return; K[k] = el.type === 'checkbox' ? el.checked : el.type === 'color' ? el.value : +el.value; readColors(); if (k === 'scale') build(); syncKnobs(); });
+knobs.querySelectorAll('[data-scheme]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-scheme]').forEach((x) => x.classList.toggle('on', x === b)); press.classList.toggle('dark', b.dataset.scheme === 'dark'); K.edgeGain = K.nodeGain = K.claimHex = null; readColors(); syncKnobs(); });
+knobs.querySelectorAll('[data-cols]').forEach((b) => b.onclick = () => { knobs.querySelectorAll('[data-cols]').forEach((x) => x.classList.toggle('on', x === b)); colsMode = b.dataset.cols; out(); layout(true); });
+document.getElementById('replay').onclick = () => { t0 = performance.now(); };
+document.getElementById('reset').onclick = () => { K = { ...DEFAULTS }; readColors(); build(); syncKnobs(); };
+
+const snapBox = document.getElementById('snap');
+snapBox.value = document.getElementById('snapshot-default').textContent.trim();
+document.getElementById('apply').onclick = () => { try { snapshot = JSON.parse(snapBox.value); document.getElementById('snaperr').textContent = ''; out(); build(); } catch (err) { document.getElementById('snaperr').textContent = String(err.message); } };
+snapshot = JSON.parse(snapBox.value); readColors(); build(); syncKnobs(); requestAnimationFrame(frame);
+})();
+</script>
+</body></html>
