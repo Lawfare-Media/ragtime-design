@@ -1,0 +1,71 @@
+<!-- @dsCard group="Foundations" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour — today and proposed</title>
+<style>
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#fbfaf7;--teal:#006a72}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--paper);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 20px;max-width:76ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  th{text-align:left;font-weight:600;color:var(--soft);padding:6px 8px;border-bottom:1px solid var(--rule)}
+  td{padding:6px 8px;border-bottom:1px solid #ece8df;vertical-align:middle}
+  .sw{display:inline-flex;align-items:center;gap:7px;font:11.5px ui-monospace,Menlo,monospace}
+  .sw i{width:26px;height:18px;border-radius:3px;border:1px solid rgba(0,0,0,.12);display:inline-block}
+  .diff{color:#a3231f;font-size:11px}
+  .same{color:#1f6b45;font-size:11px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .chip .s{height:56px;border-radius:3px;border:1px solid rgba(0,0,0,.08)}
+  .chip b{display:block;font-size:12px;margin-top:6px}
+  .chip span{font:11px ui-monospace,Menlo,monospace;color:var(--faint)}
+  .chip p{margin:2px 0 0;font-size:11px;color:var(--soft)}
+  .dark{background:#16191b;color:#e6e3dc;padding:16px;border-radius:3px;margin-top:12px}
+  .dark .chip p,.dark .chip span{color:#b4b1aa}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--teal);color:var(--teal);border-radius:3px;margin-left:6px;vertical-align:2px}
+</style></head>
+<body>
+<h1>Colour <span class="tag">proposal — not ruled</span></h1>
+<p class="lede">The three products already agree on the accent and on a warm paper. They disagree on everything around it. The top table is what ships today, read from source. The bottom is one proposed family palette that all three would read from.</p>
+
+<h2>Today, by role</h2>
+<table>
+<tr><th>Role</th><th>Recordbench (ledger look)</th><th>Recordbench Press page</th><th>The Ledger reader</th><th>RAGtime</th><th></th></tr>
+<tr><td>Accent</td><td><span class="sw"><i style="background:#1b4f9c"></i>#1b4f9c</span></td><td><span class="sw"><i style="background:#006a72"></i>#006a72</span></td><td><span class="sw"><i style="background:#006a72"></i>#006a72</span></td><td><span class="sw"><i style="background:#006a72"></i>#006a72 · primary ≈ #171717</span></td><td class="diff">Recordbench links are blue; RAGtime buttons are shadcn black</td></tr>
+<tr><td>Paper</td><td><span class="sw"><i style="background:#ffffff"></i>#ffffff</span></td><td><span class="sw"><i style="background:#e8e1cf"></i>#e8e1cf</span></td><td><span class="sw"><i style="background:#f5f3ee"></i>#f5f3ee</span></td><td><span class="sw"><i style="background:#fbfaf7"></i>#fbfaf7 / #ffffff</span></td><td class="diff">five papers</td></tr>
+<tr><td>Ink</td><td><span class="sw"><i style="background:#14181d"></i>#14181d</span></td><td><span class="sw"><i style="background:#15130f"></i>#15130f</span></td><td><span class="sw"><i style="background:#1d2125"></i>#1d2125</span></td><td><span class="sw"><i style="background:#303030"></i>#303030 / oklch .145</span></td><td class="diff">close, not equal</td></tr>
+<tr><td>Ink soft</td><td><span class="sw"><i style="background:#4b5563"></i>#4b5563</span></td><td><span class="sw"><i style="background:#4b4639"></i>#4b4639</span></td><td><span class="sw"><i style="background:#4a4f55"></i>#4a4f55</span></td><td><span class="sw"><i style="background:#737373"></i>muted-foreground</span></td><td class="diff">cool grey vs warm grey</td></tr>
+<tr><td>Rule</td><td><span class="sw"><i style="background:#e2e5ea"></i>#e2e5ea</span></td><td><span class="sw"><i style="background:#15130f47"></i>ink @28%</span></td><td><span class="sw"><i style="background:#d8d4cb"></i>#d8d4cb</span></td><td><span class="sw"><i style="background:#e3e0d8"></i>#e3e0d8 / #ebebeb</span></td><td class="diff">cool vs warm</td></tr>
+<tr><td>Dark mode</td><td>explicit data-mode</td><td>own press dark</td><td>OS + toggle</td><td>none wired</td><td class="diff">three mechanisms</td></tr>
+</table>
+
+<h2>Proposed family palette — light</h2>
+<div class="grid">
+  <div class="chip"><div class="s" style="background:#006a72"></div><b>accent</b><span>#006a72</span><p>Lawfare teal. Links, focus, the one live colour.</p></div>
+  <div class="chip"><div class="s" style="background:#dcebea"></div><b>accent-soft</b><span>#dcebea</span><p>Selection, current row.</p></div>
+  <div class="chip"><div class="s" style="background:#1d2125"></div><b>ink</b><span>#1d2125</span><p>Body and headings.</p></div>
+  <div class="chip"><div class="s" style="background:#4a4f55"></div><b>ink-soft</b><span>#4a4f55</span><p>Secondary text, nav links.</p></div>
+  <div class="chip"><div class="s" style="background:#767a7f"></div><b>ink-faint</b><span>#767a7f</span><p>Meta, separators, placeholders.</p></div>
+  <div class="chip"><div class="s" style="background:#d8d4cb"></div><b>rule</b><span>#d8d4cb</span><p>Hairlines. Warm, not blue-grey.</p></div>
+  <div class="chip"><div class="s" style="background:#fbfaf7"></div><b>raised</b><span>#fbfaf7</span><p>Sheets, menus, cards. RAGtime's paper today.</p></div>
+  <div class="chip"><div class="s" style="background:#f5f3ee"></div><b>paper</b><span>#f5f3ee</span><p>The page. Chrome paints this, never white.</p></div>
+  <div class="chip"><div class="s" style="background:#e8e1cf"></div><b>press</b><span>#e8e1cf</span><p>Display surface: Recordbench's front page, hero bands.</p></div>
+  <div class="chip"><div class="s" style="background:#ddd9d0"></div><b>desk</b><span>#ddd9d0</span><p>What the paper lies on (Ledger).</p></div>
+</div>
+
+<h2>Proposed family palette — dark</h2>
+<div class="dark"><div class="grid">
+  <div class="chip"><div class="s" style="background:#6cc0bf"></div><b>accent</b><span>#6cc0bf</span><p>Ledger's dark teal. Press uses #2fb3bd today.</p></div>
+  <div class="chip"><div class="s" style="background:#e6e3dc"></div><b>ink</b><span>#e6e3dc</span></div>
+  <div class="chip"><div class="s" style="background:#b4b1aa"></div><b>ink-soft</b><span>#b4b1aa</span></div>
+  <div class="chip"><div class="s" style="background:#33383c"></div><b>rule</b><span>#33383c</span></div>
+  <div class="chip"><div class="s" style="background:#20252a"></div><b>raised</b><span>#20252a</span></div>
+  <div class="chip"><div class="s" style="background:#16191b;border-color:#33383c"></div><b>paper</b><span>#16191b</span></div>
+  <div class="chip"><div class="s" style="background:#131416;border-color:#33383c"></div><b>press</b><span>#131416</span></div>
+</div></div>
+
+<h2>Left alone on purpose</h2>
+<p class="lede" style="margin:0">Recordbench's fixed tone, kind and series colours (alert #a3231f, open #2b5c8a, settled #1f6b45 …) are data encodings, not brand. They stay product-local. The four Recordbench looks can remain as alternates; the proposal makes one of them the family default.</p>
+</body></html>

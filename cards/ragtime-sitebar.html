@@ -1,0 +1,103 @@
+<!-- @dsCard group="Navigation" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAGtime — site bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--raised:#fbfaf7;--teal:#006a72;
+    --l-paper:#fbfaf7;--l-line:#e3e0d8;--l-text:#303030;--l-2:#5c5c5c;--l-muted:#8a8a8a;--border:#e5e5e5}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:#fff;color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 18px;max-width:80ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--faint);color:var(--faint);border-radius:3px;margin-left:6px;vertical-align:2px}
+  figure{margin:0 0 22px}
+  figcaption{font-size:12px;color:var(--soft);margin-top:8px;max-width:640px}
+  .win{border:1px solid #d6d3cb;border-radius:6px;overflow:hidden;background:#fff}
+  .bar{background:var(--l-paper);border-bottom:1px solid var(--l-line);font-family:Lato,sans-serif}
+  .in{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:12px 24px}
+  .lock{display:flex;align-items:baseline;gap:12px}
+  .wm{display:inline-flex;align-items:baseline;gap:10px;font:600 30px/2.25rem 'EB Garamond',serif;letter-spacing:-.01em;color:#0a0a0a}
+  .tg{font:italic 15px 'EB Garamond',serif;color:var(--l-2)}
+  .sl{font:15px 'EB Garamond',serif;color:var(--l-muted)}
+  .ex{font:15px 'EB Garamond',serif;color:#171717}
+  .slot{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#171717;padding:4px 8px;border-radius:3px}
+  .acc{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:6px;background:#fff;padding:4px 10px;font-size:12px;font-weight:700}
+  .acc i{width:6px;height:6px;border-radius:50%;background:#1f6b45}
+  .note{font-size:12px;color:var(--l-muted)}
+  .note b{color:var(--l-2)}
+  .body{padding:28px 24px;font-family:'EB Garamond',serif;font-size:18px;color:var(--l-text);min-height:110px}
+  svg.i{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .phone{width:390px;border:10px solid #1b1d20;border-radius:44px;overflow:hidden;background:#fff}
+  .notch{height:44px;background:var(--l-paper);display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 6px;font:600 13px/1 Inter,sans-serif}
+  .phone .in{padding:8px 12px;gap:6px 8px}
+  .phone .wm{font-size:20px;gap:8px}
+  .frames{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  .pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;background:#fff}
+</style></head>
+<body>
+<h1>RAGtime — site bar <span class="tag">as shipped</span></h1>
+<p class="lede">Read from <code>ragtime/app/src/components/SiteBar.tsx</code>. This is one persistent bar. Left: the fluted mark, an EB Garamond wordmark, a tagline and Explorer. Middle: a slot where a route puts its own controls. Right: Docs, Feedback and AI access. On a narrow screen it wraps instead of collapsing. The chrome mixes two systems: the bar paints <code>lawfare-paper</code>, and its buttons are shadcn (neutral grey border, white fill, Lato).</p>
+
+<h2>Desktop (≥ lg 1024)</h2>
+<figure>
+<div class="win" style="width:1040px">
+  <div class="bar"><div class="in">
+    <div class="lock">
+      <span class="wm"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="0" width="2" height="20"/><rect x="10" y="0" width="2" height="20"/><rect x="15" y="0" width="2" height="20"/><rect x="19" y="0" width="1" height="20"/></svg>RAGtime</span>
+      <span class="tg">research across government</span><span class="sl">/</span><span class="ex">Explorer</span>
+    </div>
+    <span class="slot"></span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 12h8M8 16h5"/></svg>Docs</span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feedback</span>
+    <span class="acc"><i></i>AI access</span>
+    <span class="note">a project of <b>Lawfare</b></span>
+  </div></div>
+  <div class="body">One search across the federal record.</div>
+</div>
+<figcaption>The mark is ink, not teal, on purpose (teal is reserved for links). Explorer is the only teal-family link in the bar, and it renders near-black because <code>text-primary</code> is shadcn black.</figcaption>
+</figure>
+
+<h2>Phone (390) — wraps</h2>
+<div class="frames">
+<figure>
+<div class="phone">
+  <div class="notch"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="bar"><div class="in">
+    <div class="lock"><span class="wm"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="0" width="2" height="16"/><rect x="5" y="0" width="2" height="16"/><rect x="9" y="0" width="2" height="16"/><rect x="13" y="0" width="2" height="16"/></svg>RAGtime</span><span class="ex" style="font-size:14px">Explorer</span></div>
+    <span class="slot"></span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/></svg></span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+    <span class="acc"><i></i>Access</span>
+  </div></div>
+  <div class="body" style="min-height:260px;font-size:17px">One search across the federal record.</div>
+</div>
+<figcaption>One row on the hub.</figcaption>
+</figure>
+<figure>
+<div class="phone">
+  <div class="notch"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="bar"><div class="in">
+    <div class="lock"><span class="wm"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="0" width="2" height="16"/><rect x="5" y="0" width="2" height="16"/><rect x="9" y="0" width="2" height="16"/><rect x="13" y="0" width="2" height="16"/></svg>RAGtime</span></div>
+    <span class="slot" style="flex:0 0 auto;display:flex;gap:6px"><span class="pill">Trail</span><span class="pill">Conversations ▾</span></span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/></svg></span>
+    <span class="btn"><svg class="i" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+    <span class="acc"><i></i>Access</span>
+  </div></div>
+  <div class="body" style="min-height:220px;font-size:17px">Explorer conversation…</div>
+</div>
+<figcaption>On the Explorer the route slot holds two controls, so the global cluster wraps to a second row. The order of the controls changes from page to page, and nothing is reachable by thumb.</figcaption>
+</figure>
+</div>
+<h2>Gaps against the family</h2>
+<ul style="padding-left:18px;margin:0;font-size:12.5px;color:var(--soft);max-width:80ch">
+  <li>Two palettes in one bar: shadcn neutral for buttons and borders, Lawfare warm for the bar. <code>--primary</code> becomes teal, or buttons stop reading it.</li>
+  <li>Lato is the UI face. The family proposal is Inter.</li>
+  <li>No phone form, only wrapping. A two-row Ledger-style layout (brand and tools, then route slot) would keep the order stable.</li>
+  <li>Dark mode is defined but never toggled.</li>
+</ul>
+</body></html>

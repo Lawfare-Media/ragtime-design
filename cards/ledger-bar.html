@@ -1,0 +1,104 @@
+<!-- @dsCard group="Navigation" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Ledger — reader bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--rule-soft:#e9e5dc;--paper:#f5f3ee;--raised:#fbfaf7;--desk:#ddd9d0;--teal:#006a72;
+    --schola:'TeX Gyre Schola','Century Schoolbook','New Century Schoolbook',Georgia,serif}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--raised);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 18px;max-width:80ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--faint);color:var(--faint);border-radius:3px;margin-left:6px;vertical-align:2px}
+  .frames{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  figure{margin:0}
+  figcaption{font-size:12px;color:var(--soft);margin-top:8px;max-width:420px}
+  .win{border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;background:var(--desk)}
+  .phone{width:390px;height:520px;border:10px solid #1b1d20;border-radius:44px;overflow:hidden;background:var(--desk)}
+  .notch{height:44px;background:color-mix(in srgb,var(--desk) 86%,transparent);display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 6px;font:600 13px/1 Inter,sans-serif}
+  .bar{background:color-mix(in srgb,var(--desk) 86%,transparent);border-bottom:1px solid var(--rule-soft)}
+  .in{display:flex;align-items:center;gap:1.5rem;padding:.7rem 1.5rem}
+  .wm{display:inline-flex;align-items:center;gap:.6rem;font:600 15px/1 Inter,sans-serif;letter-spacing:-.01em;white-space:nowrap}
+  .wm svg{color:var(--teal)}
+  .nav{display:flex;gap:1.25rem;font:450 14px/1 Inter,sans-serif;color:var(--soft)}
+  .nav span:first-child{color:var(--ink)}
+  .tools{display:flex;align-items:center;gap:.75rem;margin-left:auto}
+  .search{display:flex;align-items:center;gap:.4rem;padding:0 .7rem;height:30px;border-radius:999px;background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--faint);font-size:13.5px;width:11rem}
+  .ib{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;color:var(--soft)}
+  .seg{display:inline-flex;padding:2px;border-radius:999px;background:color-mix(in srgb,var(--ink) 6%,transparent);font-size:12px}
+  .seg b,.seg span{padding:4px 10px;border-radius:999px;font-weight:500}
+  .seg b{background:var(--raised);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .seg span{color:var(--soft)}
+  .sheet{background:var(--paper);margin:18px auto 0;max-width:46rem;padding:30px 40px;min-height:150px;font-family:var(--schola);border:1px solid var(--rule-soft)}
+  .sheet h4{margin:0 0 8px;font:700 26px/1.15 var(--schola)}
+  .sheet p{margin:0;font-size:16px;color:var(--soft)}
+  /* phone two rows */
+  .phone .in{flex-wrap:wrap;gap:.55rem .5rem;padding:.55rem 1rem .6rem}
+  .phone .wm{order:1;margin-right:auto}
+  .phone .search{display:none}
+  .phone .s2{order:2}.phone .s3{order:3}
+  .phone .brk{order:4;flex-basis:100%;height:0}
+  .phone .nav{order:5;flex:1;gap:1rem;font-size:13.5px}
+  .phone .seg{order:6}
+  .phone .tools{display:contents}
+  .phone .sheet{margin:0;padding:2.25rem 1.15rem;border:0;min-height:300px}
+  .phone .sheet h4{font-size:22px}
+  svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round}
+</style></head>
+<body>
+<h1>The Ledger — reader bar <span class="tag">as shipped</span></h1>
+<p class="lede">Read from <code>lawfare-web/src/looks/ragtime/reader/Shell.tsx</code> and <code>reader.css</code>. This is the most finished nav of the three. It is a sticky bar of frosted "desk", with an Inter UI, a Schola sheet and a 1px reading-progress rule. Its phone form is two rows. Treat it as the reference shape for the family bar.</p>
+
+<h2>Desktop (≥ 52rem)</h2>
+<figure>
+<div class="win" style="width:960px">
+  <div class="bar"><div class="in">
+    <span class="wm"><svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="3" width="2" height="17"/><rect x="9" y="0" width="3" height="20"/><rect x="14" y="3" width="2" height="17"/><rect x="18" y="0" width="2" height="20"/></svg>The Ledger</span>
+    <span class="nav"><span>Latest</span><span>Topics</span><span>About</span></span>
+    <span class="tools">
+      <span class="search"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75"/><path d="M10.5 10.5 14 14"/></svg>Search</span>
+      <span class="ib"><svg class="i" viewBox="0 0 16 16"><path d="M5 2h6v12l-3-2.5L5 14z"/></svg></span>
+      <span class="seg"><b>Reader</b><span>Desktop</span></span>
+      <span class="ib"><svg class="i" viewBox="0 0 16 16"><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z"/></svg></span>
+    </span>
+  </div></div>
+  <div style="padding:0 0 24px"><div class="sheet"><h4>What the record says about consent decrees</h4><p>The Justice Department entered fourteen decrees between 2009 and 2016. This piece reads them in order.</p></div></div>
+</div>
+<figcaption>Wordmark, three sections, search pill, pins, Reader/Desktop mode, scheme. 30px round targets.</figcaption>
+</figure>
+
+<h2>Phone (&lt; 34rem) — two rows</h2>
+<div class="frames">
+<figure>
+<div class="phone">
+  <div class="notch"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="bar"><div class="in">
+    <span class="wm"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="3" width="2" height="17"/><rect x="9" y="0" width="3" height="20"/><rect x="14" y="3" width="2" height="17"/><rect x="18" y="0" width="2" height="20"/></svg>The Ledger</span>
+    <span class="tools">
+      <span class="search"></span>
+      <span class="ib s2"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75"/><path d="M10.5 10.5 14 14"/></svg></span>
+      <span class="ib s3"><svg class="i" viewBox="0 0 16 16"><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z"/></svg></span>
+      <span class="brk"></span>
+      <span class="nav"><span>Latest</span><span>Topics</span><span>About</span></span>
+      <span class="seg"><b>Reader</b><span>Desktop</span></span>
+    </span>
+  </div></div>
+  <div class="sheet"><h4>What the record says about consent decrees</h4><p>The Justice Department entered fourteen decrees between 2009 and 2016. This piece reads them in order.</p></div>
+</div>
+<figcaption>Row 1: brand, search icon, scheme. Row 2: sections, then mode. About 88px of chrome. Icon targets stay at 30px, below the 44px the other two products use on a phone.</figcaption>
+</figure>
+<div style="max-width:380px;font-size:12.5px;color:var(--soft)">
+  <h2 style="margin-top:0">Gaps against the family</h2>
+  <ul style="padding-left:18px;margin:0">
+    <li>Four breakpoints (34, 48, 52rem, 640px). They map onto phone and tablet.</li>
+    <li>Phone targets are 30px. The family floor is 44px.</li>
+    <li>The legacy <code>look.css</code> (accent #b4451f, 40rem) and the <code>/desktop</code> OS look (760px) still ship beside it.</li>
+    <li>Type sizes are px fractions (12.5, 13.5px). They move to the shared scale.</li>
+  </ul>
+</div>
+</div>
+</body></html>
