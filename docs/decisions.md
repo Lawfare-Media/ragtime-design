@@ -33,3 +33,5 @@ are not kept.
 - Whether RAGtime keeps Lato or uses Inter for its UI.
 - Whether Recordbench reads in Iowan or EB Garamond.
 - Whether Recordbench's four looks remain as alternates.
+
+**Ruled after review (Thomas, same day):** dark `sunk` is `#111416`, darker than dark paper, so sunk means recessed in both modes. The Ledger's dark wells get slightly darker as a result.

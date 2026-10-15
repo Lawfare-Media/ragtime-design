@@ -81,7 +81,8 @@
         "value": "#20252a"
       },
       "sunk": {
-        "value": "#1c2023"
+        "value": "#111416",
+        "note": "Darker than paper, as in light mode: sunk means recessed."
       },
       "press": {
         "value": "#131416"

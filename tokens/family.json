@@ -26,7 +26,7 @@
       "rule-soft": { "value": "#262a2d" },
       "paper": { "value": "#16191b" },
       "raised": { "value": "#20252a" },
-      "sunk": { "value": "#1c2023" },
+      "sunk": { "value": "#111416", "note": "Darker than paper, as in light mode: sunk means recessed." },
       "press": { "value": "#131416" },
       "desk": { "value": "#0c0e10" }
     }

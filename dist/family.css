@@ -64,7 +64,7 @@
   --rt-rule-soft: #262a2d;
   --rt-paper: #16191b;
   --rt-raised: #20252a;
-  --rt-sunk: #1c2023;
+  --rt-sunk: #111416; /* Darker than paper, as in light mode: sunk means recessed. */
   --rt-press: #131416;
   --rt-desk: #0c0e10;
 }
