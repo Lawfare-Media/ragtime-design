@@ -1,0 +1,10 @@
+{
+  "$description": "The only investigation names a mockup may show. The repo is public, so real investigation names never appear in design/. `task check` enforces this; add a name here before using it in a card.",
+  "investigations": [
+    "Agency rule changes",
+    "Grant terminations",
+    "Court filings review",
+    "Public statements",
+    "Sanctions designations"
+  ]
+}

@@ -5,7 +5,7 @@
 // holds is what they get. The build refuses to run if package.json and the token source
 // disagree on the version, because the tag, the package and the header must all say one thing.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -90,7 +90,29 @@ function tailwind() {
 
 const header = (c) => `${c} @lawfare/ragtime-design v${src.version} · generated from tokens/family.json · do not edit`;
 
+// The faces the family ships rather than names: today only Inter, the chrome face every
+// product shares (ruled 2026-10-15). A product that wants it imports family-fonts.css; the
+// woff2 sits beside it under dist/fonts/, so the relative url resolves from the package.
+function fonts() {
+  return [
+    '/* Inter (SIL Open Font License 1.1, fonts/inter/OFL.txt). One variable file covers 100-900. */',
+    '@font-face {',
+    "  font-family: 'Inter';",
+    '  font-style: normal;',
+    '  font-weight: 100 900;',
+    '  font-display: swap;',
+    "  src: url('./fonts/InterVariable.woff2') format('woff2');",
+    '}',
+    '',
+  ].join('\n');
+}
+
+mkdirSync(join(out, 'fonts'), { recursive: true });
+copyFileSync(join(root, 'fonts/inter/InterVariable.woff2'), join(out, 'fonts/InterVariable.woff2'));
+copyFileSync(join(root, 'fonts/inter/OFL.txt'), join(out, 'fonts/Inter-OFL.txt'));
+
 const files = {
+  'family-fonts.css': `/*${header('')} */\n${fonts()}`,
   'family.css': `/*${header('')} */\n${css()}`,
   'family.tailwind.css': `/*${header('')} */\n${tailwind()}`,
   'family.json': JSON.stringify(src, null, 2) + '\n',

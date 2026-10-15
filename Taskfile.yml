@@ -11,6 +11,7 @@ tasks:
     cmds:
       - node scripts/build.mjs
       - git diff --exit-code -- dist/
+      - node scripts/check-cards.mjs
 
   status:
     desc: Which ragtime-design version each consumer has vendored (reads GitHub, needs gh)

@@ -3,6 +3,43 @@
 Newest first. A decision made in a Claude Design chat or a meeting is recorded here, because those
 are not kept.
 
+## 2026-10-15 — round 1 rulings (ratified by Thomas in Claude Design), v0.2.0
+
+Source: `design/index.html`, `design/cards/type.html` and `design/cards/colour.html`, pulled the same
+day.
+
+- **Type roles are ratified.** All chrome uses Inter and the system mono in every product. Display
+  and reading faces stay per product. The eight-step type scale, with nothing below 11px, is shared.
+- **Recordbench keeps Iowan** as its reading face. Reading is per product.
+- **The family palette is ratified**, light and dark, as in v0.1.0.
+- **Inter now ships in the package** (v0.2.0) as `family-fonts.css` plus `fonts/InterVariable.woff2`,
+  under the SIL Open Font License. Each consumer imports it once, so that "Inter for all chrome"
+  holds without a separate font dependency in each product.
+- **Mockups use fixture names only.** `design/fixtures.json` lists them, and `task check` rejects any
+  other name.
+
+**Still open:** whether Recordbench keeps its four looks as alternates. Breakpoints and spacing
+remain a proposal.
+
+## 2026-10-15 — Recordbench shell: Proposal C (ratified by Thomas in Claude Design)
+
+Source: `cards/recordbench-shell.html`, pulled from the Claude Design project the same day.
+
+- **No separate shell bar on the Press page.** The account avatar sits in the masthead row, to
+  the right of the title, at every width.
+- **Desktop:** agent, settings and account sit in one cluster at the right of the title row, in
+  that order.
+- **Phone (below the phone breakpoint):** the dock holds icon-only slots, agent on the left and
+  settings on the right. Back and Find join the dock only on inner pages. Labels survive only as
+  accessible names. The dock pads by `env(safe-area-inset-bottom)` when the app runs without
+  browser chrome.
+- **The agent icon is a robot with two states.** Connected: teal, with a green dot. Not
+  connected: dashed and grey, with a pulsing amber dot that opens the connect flow when tapped.
+- **Inner pages (the card was silent on these; this is the agent's default, which Thomas
+  accepted):** with no Press masthead, the avatar sits at the right end of the crumb row. The
+  phone dock has four slots: Back, Find, agent, settings.
+- This supersedes Proposals A and B, and the interim two-slot Back/Find dock fix.
+
 ## 2026-10-15 — v0.1.0, round 1
 
 **Decided (Thomas):**
@@ -28,10 +65,6 @@ are not kept.
 
 **Open:**
 
-- The Recordbench phone shell. Proposal A paints the chrome in the page's paper and moves settings
-  into the dock. Proposal B removes the top bar on a phone. See `cards/recordbench-shell.html`.
-- Whether RAGtime keeps Lato or uses Inter for its UI.
-- Whether Recordbench reads in Iowan or EB Garamond.
 - Whether Recordbench's four looks remain as alternates.
 
 **Ruled after review (Thomas, same day):** dark `sunk` is `#111416`, darker than dark paper, so sunk means recessed in both modes. The Ledger's dark wells get slightly darker as a result.

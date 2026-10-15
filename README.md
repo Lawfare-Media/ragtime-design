@@ -17,8 +17,11 @@ display and reading type.
 
 ```
 tokens/family.json   the one source of truth
-dist/                generated and committed: family.css, family.tailwind.css, family.json
-cards/               design-system cards (HTML), the source of the Claude Design project "RAGtime Family"
+fonts/               faces the family ships (Inter, OFL), copied into dist/fonts/ by the build
+dist/                generated and committed: family.css, family-fonts.css, family.tailwind.css,
+                     family.json, fonts/
+design/              mirror of the Claude Design project "RAGtime Family": index.html, cards/
+design/fixtures.json the only investigation names a mockup may show (the repo is public)
 docs/decisions.md    what was decided, when and why. Design chats are not a record
 consumers.json       each consumer and the package.json that depends on this
 ```
@@ -46,8 +49,18 @@ the exact commit.
   that follows the OS sets its own attribute.
 - **Breakpoints** cannot be custom properties inside `@media`, so write the literal: phone `40rem`,
   tablet `64rem`.
-- **Fonts** are named here but not shipped. Each product self-hosts the faces it uses. Where a face
-  is not loaded, the stacks fall back cleanly.
+- **Fonts:** Inter, the shared chrome face, ships in the package. Import
+  `@lawfare/ragtime-design/family-fonts.css` once; the woff2 is resolved relative to it from
+  `dist/fonts/`. Each product's voice faces (Garamond, Schola, Iowan, Didot) stay the product's to
+  load. A build that inlines CSS must copy `dist/fonts/` alongside.
+
+## Pulling from Claude Design
+
+`design/` mirrors the Claude Design project file for file. To pull a round of changes, read the
+changed cards and write them to the same paths. Replace any real investigation names with names
+from `design/fixtures.json`, then log what was ratified in `docs/decisions.md`. `task check` fails
+on any investigation name that is not a fixture. Push the scrubbed cards back to Claude Design so the
+two copies stay the same.
 
 ## Changing a token
 

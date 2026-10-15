@@ -1,0 +1,103 @@
+<!-- @dsCard group="Navigation" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recordbench — shell bar and phone dock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#fbfaf7;--teal:#006a72;
+    /* Recordbench today */
+    --rb-ink:#14181d;--rb-soft:#4b5563;--rb-faint:#6b7280;--rb-paper:#ffffff;--rb-rule:#e2e5ea;
+    /* Press */
+    --pp:#e8e1cf;--pi:#15130f;--pi2:#4b4639;--pi3:#7d7665;--plate:#006a72;
+    --didot:Didot,'Bodoni 72','Bodoni MT','Playfair Display',serif;
+    --serif:'Iowan Old Style',Charter,Georgia,serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--paper);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 18px;max-width:80ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--teal);color:var(--teal);border-radius:3px;margin-left:6px;vertical-align:2px}
+  .tag.now{border-color:var(--faint);color:var(--faint)}
+  .frames{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  figure{margin:0}
+  figcaption{font-size:12px;color:var(--soft);margin-top:8px;max-width:390px}
+  figcaption b{color:var(--ink)}
+  .desk{width:960px;border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;background:var(--pp);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .phone{width:390px;height:720px;border:10px solid #1b1d20;border-radius:44px;overflow:hidden;position:relative;background:var(--pp);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .phone::before{content:'';position:absolute;z-index:6;top:10px;left:50%;width:118px;height:34px;margin-left:-59px;border-radius:17px;background:#0b0b0c}
+  .safari{position:absolute;left:0;right:0;bottom:0;height:84px;background:#f4f4f6;border-top:1px solid #d6d6da;display:flex;justify-content:center;padding-top:8px}.url{width:340px;height:40px;border-radius:12px;background:#e4e4e8;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:13px Inter,sans-serif;color:#14181d}
+  .phone::after{content:'';position:absolute;z-index:6;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:#14181d}
+  .notch{height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 6px;font:600 13px/1 Inter,sans-serif}
+  .note{position:absolute;z-index:5;font:600 10.5px/1.3 Inter,sans-serif;color:#fff;background:#a3231f;padding:3px 7px;border-radius:3px;white-space:nowrap}
+  .note::before{content:'';position:absolute;width:8px;height:8px;background:#a3231f;transform:rotate(45deg)}
+  .note.up::before{top:-4px;left:12px}.note.up.r::before{left:auto;right:30px}
+  .note.down::before{bottom:-4px;left:12px}
+  .note.good{background:var(--teal)}.note.good::before{background:var(--teal)}
+
+  /* shell bar — today */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:4px 14px;background:var(--rb-paper);border-bottom:1px solid var(--rb-rule);font-family:system-ui,-apple-system,sans-serif;color:var(--rb-ink)}
+  .att{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--rb-soft)}
+  .att i{width:8px;height:8px;border-radius:50%;background:#1f6b45;display:inline-block}
+  .tools{display:flex;align-items:center;gap:6px}
+  .ico{width:26px;height:26px;display:grid;place-items:center;color:var(--rb-soft)}
+  .ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .av{width:22px;height:22px;border-radius:50%;background:var(--rb-ink);color:#fff;font:700 9px/22px system-ui;text-align:center}
+  .phone .bar{min-height:52px;padding:0 10px}
+  .phone .ico{width:44px;height:44px}
+  .phone .av{width:32px;height:32px;line-height:32px;font-size:11px}
+
+  /* press masthead */
+  .mast{background:var(--pp);color:var(--pi)}
+  .mast .title{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:end;padding:22px 24px 18px;border-bottom:4px double var(--pi)}
+  .mast h3{margin:0;font:700 44px/.8 var(--didot);letter-spacing:-.045em;text-shadow:1.6px 1px 0 var(--plate)}
+  .mast p{margin:0;font:13px/1.4 var(--serif)}
+  .mast p span+span{margin-left:.4em;color:var(--pi2)}
+  .phone .mast .title{grid-template-columns:1fr;gap:4px;padding:16px 14px 14px}
+  .phone .mast h3{font-size:36px}
+  .phone .mast p{font-size:12px}
+  .stage{height:260px;background:
+      radial-gradient(circle at 30% 45%,rgba(0,106,114,.18) 0 40px,transparent 41px),
+      radial-gradient(circle at 62% 60%,rgba(21,19,15,.12) 0 70px,transparent 71px),
+      radial-gradient(circle at 80% 30%,rgba(21,19,15,.10) 0 34px,transparent 35px),var(--pp)}
+  .list{list-style:none;margin:0;padding:0 14px}
+  .list li{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #15130f30;font:15px/1.3 var(--serif);color:var(--pi)}
+  .list li span{font:700 15px/1.3 var(--didot);color:var(--pi3);width:22px}
+  .list li small{display:block;font:11px var(--mono);color:var(--pi3);margin-top:3px}
+
+  /* dock */
+  .dock{position:absolute;left:0;right:0;bottom:84px;display:grid;grid-template-columns:repeat(3,1fr);background:var(--rb-paper);border-top:1px solid var(--rb-rule);padding-bottom:0;font-family:system-ui,-apple-system,sans-serif}
+  .dock div{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;font-size:14px;color:var(--rb-ink);border-right:1px solid var(--rb-rule)}
+  .dock div:last-child{border-right:0}
+  .dock .gap{background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(163,35,31,.10) 6px 12px)}
+  .dock svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+
+  /* proposed: chrome takes the page's paper */
+  .p .bar{background:var(--pp);border-bottom:0;color:var(--pi);font-family:Inter,sans-serif}
+  .p .att{color:var(--pi2)}
+  .p .ico{color:var(--pi2)}
+  .p .av{background:var(--pi)}
+  .p .dock{background:var(--pp);border-top:1px solid #15130f40;font-family:Inter,sans-serif}
+  .p .dock div{color:var(--pi);border-right-color:#15130f30}
+  .p .dock .on{color:var(--plate)}
+  .bot b{position:absolute;top:-3px;right:-5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--pp)}.bot.on b{background:#1f6b45}.p .dock .bot.off{color:var(--pi3)}.bot.off svg{stroke-dasharray:2.5 2.5}.bot.off b{background:#b4690e;animation:pu 1.6s infinite}@keyframes pu{50%{box-shadow:0 0 0 5px rgba(180,105,14,.28)}}.seg{display:flex;gap:4px;align-items:center}.pill{width:34px;height:34px;border-radius:17px;display:grid;place-items:center;color:var(--pi2)}.pill.on{background:var(--pi);color:var(--pp)}.pill svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body>
+<style>a{color:#006a72}a:hover{color:#1d2125}.back{display:inline-block;font-size:12px;margin-bottom:14px}</style>
+<a class="back" href="../index.html">← Index</a>
+<h1>Recordbench — shell bar and phone dock</h1>
+<p class="lede">Ratified 2026-10-15 (Proposal C). Source: <code>AppShell.svelte</code>, <code>ShellTools.svelte</code>, <code>CrumbRow.svelte</code>, <code>Press.svelte</code> at <code>origin/main</code> after #124 and #125.</p>
+
+<h2>Desktop — ruled <span class="tag">ratified 2026-10-15</span></h2><figure class="p"><div class="desk"><div class="mast" style="position:relative"><div class="title" style="grid-template-columns:auto minmax(0,1fr) auto"><h3>recordbench</h3><p><span>Recordbench keeps the record of an investigation. It keeps every source, quoted passage, claim, and review, and it says who did what and when.</span><span>Read what this tool is, and what the record promises.</span><span>This bench holds seven investigations.</span></p><div style="display:flex;align-items:center;gap:14px;align-self:end;margin-bottom:2px"><div class="ico bot on" aria-label="Agent connected" style="position:relative;color:var(--plate)"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></div><div class="ico" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div><div class="av" aria-label="Account" style="width:30px;height:30px;line-height:30px;font-size:11px">TK</div></div></div></div><div class="stage"></div></div><figcaption style="max-width:640px"><b>Same ruling on desktop.</b> No separate bar. Agent, settings and account sit in one cluster in their own column at the right of the title row, in the order the phone uses (agent, settings) with the account last. The robot takes the same states as on the phone: teal with a green dot when connected, dashed grey with a pulsing amber dot when not.</figcaption></figure>
+<h2>Phone — ruled <span class="tag now">investigation names and counts are illustrative</span></h2>
+<div class="frames">
+<figure class="p"><div class="phone"><div class="notch"><span>9:41</span><span>●●● ▮</span></div><div class="mast"><div class="title" style="padding-top:8px"><div style="display:flex;justify-content:space-between;align-items:flex-end"><h3>recordbench</h3><div class="av" aria-label="Account">TK</div></div><p><span>Recordbench keeps the record of an investigation…</span></p></div></div><ol class="list"><li><span>I</span><div>Agency rule changes<small>214 sources · 61 claims</small></div></li><li><span>II</span><div>Grant terminations<small>82 sources · 19 claims</small></div></li><li><span>III</span><div>Court filings review<small>40 sources · 12 claims</small></div></li><li><span>IV</span><div>Public statements<small>33 sources</small></div></li></ol><div class="safari"><div class="url"><span>aA</span><span>recordbench.app</span><span>↻</span></div></div><div class="dock" style="grid-template-columns:repeat(2,1fr)"><div class="bot on" aria-label="Agent connected"><span style="position:relative;display:grid"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></span></div><div aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div></div></div><figcaption><b>Proposal C — agent connected.</b> <span class="tag">ratified 2026-10-15</span> Account sits in the masthead row, right of the title, with no separate bar. On the home page the dock has two icon-only slots: agent left, settings lower right. Back and Find appear only on inner pages. The robot is teal with a green dot when an agent is listening.</figcaption></figure><figure class="p"><div class="phone"><div class="notch"><span>9:41</span><span>●●● ▮</span></div><div class="mast"><div class="title" style="padding-top:8px"><div style="display:flex;justify-content:space-between;align-items:flex-end"><h3>recordbench</h3><div class="av" aria-label="Account">TK</div></div><p><span>Recordbench keeps the record of an investigation…</span></p></div></div><ol class="list"><li><span>I</span><div>Agency rule changes<small>214 sources · 61 claims</small></div></li><li><span>II</span><div>Grant terminations<small>82 sources · 19 claims</small></div></li><li><span>III</span><div>Court filings review<small>40 sources · 12 claims</small></div></li><li><span>IV</span><div>Public statements<small>33 sources</small></div></li></ol><div class="safari"><div class="url"><span>aA</span><span>recordbench.app</span><span>↻</span></div></div><div class="dock" style="grid-template-columns:repeat(2,1fr)"><div class="bot off" aria-label="Connect an agent"><span style="position:relative;display:grid"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13.5h.01M14.5 13.5h.01"/></svg><b></b></span></div><div aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div></div></div><figcaption><b>Proposal C — not connected.</b> <span class="tag">ratified 2026-10-15</span> The robot goes dashed and grey with a pulsing amber dot, inviting a tap to connect an agent. Labels remain as accessible names only.</figcaption></figure>
+</div>
+
+<h2>What the ruling changes in code</h2>
+<p class="lede" style="margin:0">AppShell draws no separate bar on the Press page. The masthead row hosts the account on every width, plus agent and settings in a cluster on desktop. Below <code>--bp-phone</code>, agent and settings move to a two-slot icon dock above the browser bar, and Back and Find join the dock on inner pages. The agent icon has two states (connected, not connected). Account details move out of ShellTools into the masthead row, and the dock pads by <code>env(safe-area-inset-bottom)</code> when the app runs without browser chrome.</p>
+</body></html>
