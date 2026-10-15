@@ -3,52 +3,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RAGtime Family — design system</title>
 <style>
-  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#f5f3ee;--teal:#006a72}
-  body{margin:0;padding:40px;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;max-width:860px}
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#f5f3ee;--teal:#006a72;--settled:#1f6b45;--settled-w:#e9f4ee;--open:#2b5c8a;--open-w:#eaf1f8;--neutral-w:#efece5}
+  body{margin:0;padding:40px;background:var(--paper);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,sans-serif;max-width:900px}
   h1{font:600 30px/1.1 'EB Garamond',Georgia,serif;margin:0 0 6px}
   p{color:var(--soft);max-width:72ch}
-  h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:30px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
-  ul{padding-left:18px}li{margin:4px 0}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin:34px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
   a{color:var(--teal)}
   code{font:12.5px ui-monospace,Menlo,monospace}
-  table{border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:5px 12px 5px 0;border-bottom:1px solid #e9e5dc}
+  table{border-collapse:collapse;font-size:14px;width:100%;table-layout:fixed}
+  td{text-align:left;vertical-align:top;padding:7px 14px 7px 0;border-bottom:1px solid #e9e5dc}
+  td:first-child{width:240px}
+  td.st{width:100px}
+  .chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;padding:1px 7px;border-radius:3px}
+  .ratified{color:var(--settled);background:var(--settled-w)}
+  .proposal{color:var(--open);background:var(--open-w)}
+  .shipped{color:var(--soft);background:var(--neutral-w)}
+  ol.open{padding-left:20px;margin:0}ol.open li{margin:0 0 8px}
+  .note{font-size:13px}
 </style></head>
 <body>
 <h1>RAGtime Family</h1>
-<p>One design system for three products that sit on the same record: <b>RAGtime</b> (search across the federal record), <b>The Ledger</b> (the RAGtime blog reader) and <b>Recordbench</b> (the investigation workbench). They share foundations and chrome. Each keeps its own voice in display and reading type.</p>
+<p>One design system for four products that sit on the same record: <b>RAGtime</b> (search across the federal record), <b>The Ledger</b> (the RAGtime blog reader), <b>Recordbench</b> (the investigation workbench) and <b>Investigations</b>, which takes the tokens but has no card of its own yet. They share foundations and chrome. Each keeps its own voice in display and reading type.</p>
 
-<h2>What is here (round 1, 2026-10-15)</h2>
-<ul>
-  <li><a href="cards/colour.html">Colour</a>: every role today in all three products, plus one proposed palette for light and dark.</li>
-  <li><a href="cards/type.html">Type</a>: shared chrome faces (Inter and the system mono), with display and reading faces kept per product.</li>
-  <li><a href="cards/space-breakpoints.html">Space, radius, breakpoints</a>: eleven breakpoints today reduced to two (phone at 40rem, tablet at 64rem).</li>
-  <li><a href="cards/family-bar.html">Family bar</a>: the proposed shared nav anatomy, shown with all three products.</li>
-  <li><a href="cards/recordbench-shell.html">Recordbench shell</a>: the ratified shell (Proposal C) on phone and desktop.</li>
-  <li><a href="cards/ledger-bar.html">The Ledger bar</a> and <a href="cards/ragtime-sitebar.html">RAGtime site bar</a>: each as shipped, with its gaps against the family.</li>
-</ul>
+<h2>Open for Thomas</h2>
+<ol class="open">
+  <li><b>Recordbench looks.</b> Retire ledger, imprint, broadsheet and slate, or keep them as alternates behind settings? Production is family. <a href="cards/recordbench-inventory.html">Inventory</a> · <a href="cards/recordbench-gates.html">Settings</a></li>
+  <li><b>Overview masthead.</b> Keep the essay's 40px title as the investigation's cover, or bring it to 28px with every other inner page? <a href="cards/recordbench-inventory.html">Inventory</a></li>
+  <li><b>Requests rows.</b> Keep them boxed, since each holds a file form, or move them to the shared row with the form in a disclosure? <a href="cards/recordbench-inventory.html">Inventory</a></li>
+  <li><b>Data model.</b> Bring it under the shell, or move it out of Recordbench? <a href="cards/recordbench-gates.html">Gates</a></li>
+  <li><b>Breakpoints and spacing.</b> Ratify two breakpoints (phone below 40rem, tablet to 64rem) and the eight spacing steps? <a href="cards/space-breakpoints.html">Space</a></li>
+  <li><b>Family bar.</b> Adopt the shared nav anatomy across the products? <a href="cards/family-bar.html">Family bar</a></li>
+  <li><b>Tracker face.</b> Move the tracker from Lato to Inter, like the rest of the chrome?</li>
+  <li><b>Licence.</b> The package is <code>UNLICENSED</code> in a public repository. Choose a licence.</li>
+</ol>
 
-<h2>Recordbench screens (round 2, 2026-10-15)</h2>
-<ul>
-  <li><a href="cards/recordbench-inventory.html">Screen inventory</a>: every screen Recordbench serves, its shell today, and one proposed rule for each place the screens diverge.</li>
-  <li><a href="cards/recordbench-press.html">The Press</a>: the front page as a page of plates (decision #250), each drawn live at rest from an editable fixture snapshot, with knobs for ink, draw-in and sampling.</li>
-  <li><a href="cards/recordbench-components.html">Components</a>: state pills, kind marks, chips, voices, and the parts that drifted into several (filters, boxes, rows, disclosures, labels, page titles).</li>
-  <li><a href="cards/recordbench-pages.html">Product pages, unified</a>: the ten pages inside an investigation, redrawn in one shell.</li>
-  <li><a href="cards/recordbench-gates.html">Gates, agent and edges, unified</a>: the bench levels, the agent pages, Connect, Allow, Founding, settings, the phone dock, the tutorial and the data model.</li>
-</ul>
-
-<h2>Status</h2>
-<p>Everything labelled <i>as shipped</i> was read from source on 2026-10-15. Recordbench was read at <code>origin/main</code> after #124 and #125, RAGtime at <code>app/src</code>, and the Ledger at <code>lawfare-web/src/looks/ragtime/reader</code>. Everything labelled <i>proposal</i> is unruled, except Recordbench phone Proposal C, the type roles and the family palette, all ratified 2026-10-15.</p>
-<p>Illustrative investigation names in mockups come only from <code>design/fixtures.json</code> in the ragtime-design repo. Its check rejects any other name, because the repo is public.</p>
-
-<h2>Considered and not taken</h2>
-<p>Recordbench phone, Proposal A kept a top bar in the page's paper and moved settings to the dock. Proposal B removed the top bar and put the account in the dock. Proposal C was ruled instead.</p>
-
-<h2>Open questions for the next round</h2>
+<h2>Foundations</h2>
 <table>
-<tr><td><a href="cards/recordbench-shell.html">Recordbench phone</a></td><td><b>Ruled 2026-10-15: Proposal C.</b> Account in the masthead row, agent and settings in a two-slot icon dock (Back and Find on inner pages only), Safari bar below.</td></tr>
-<tr><td><a href="cards/type.html">UI face</a></td><td><b>Ruled 2026-10-15: type roles as proposed</b> (Inter for all chrome).</td></tr>
-<tr><td><a href="cards/type.html">Recordbench reading face</a></td><td><b>Ruled 2026-10-15: keep Iowan</b> (reading is per product).</td></tr>
-<tr><td><a href="cards/colour.html">Default paper</a></td><td><b>Ruled 2026-10-15: family palette unified</b>, light and dark as on the Colour card.</td></tr>
-<tr><td><a href="cards/recordbench-shell.html">Recordbench looks</a></td><td>Keep the four looks as alternates, or retire them once the family default lands?</td></tr>
+<tr><td><a href="cards/colour.html">Colour</a></td><td class="st"><span class="chip ratified">ratified</span></td><td>Every role in each product, and the one family palette for light and dark.</td></tr>
+<tr><td><a href="cards/type.html">Type</a></td><td class="st"><span class="chip ratified">ratified</span></td><td>Inter and the system mono for all chrome; display and reading faces per product; eight steps, nothing below 11px.</td></tr>
+<tr><td><a href="cards/space-breakpoints.html">Space, radius, breakpoints</a></td><td class="st"><span class="chip proposal">proposal</span></td><td>Eleven breakpoints today reduced to two; eight spacing steps; 3px default radius.</td></tr>
 </table>
+
+<h2>Chrome</h2>
+<table>
+<tr><td><a href="cards/family-bar.html">Family bar</a></td><td class="st"><span class="chip proposal">proposal</span></td><td>The shared nav anatomy, shown with each product.</td></tr>
+<tr><td><a href="cards/ragtime-sitebar.html">RAGtime site bar</a></td><td class="st"><span class="chip shipped">as shipped</span></td><td>RAGtime's bar today, with its gaps against the family.</td></tr>
+<tr><td><a href="cards/ledger-bar.html">The Ledger bar</a></td><td class="st"><span class="chip shipped">as shipped</span></td><td>The Ledger's bar today, with its gaps against the family.</td></tr>
+<tr><td><a href="cards/recordbench-shell.html">Recordbench shell</a></td><td class="st"><span class="chip ratified">ratified</span></td><td>Proposal C: no shell bar; agent, settings and account in the masthead row; icon-only phone dock.</td></tr>
+</table>
+
+<h2>Recordbench screens</h2>
+<table>
+<tr><td><a href="cards/recordbench-inventory.html">Screen inventory</a></td><td class="st"><span class="chip shipped">as shipped</span></td><td>Every screen, its shell today, and one proposed rule for each place the screens diverge.</td></tr>
+<tr><td><a href="cards/recordbench-press.html">The Press</a></td><td class="st"><span class="chip shipped">live port</span></td><td>The front page as a page of plates (decision #250), drawn from an editable fixture snapshot, with knobs for ink, draw-in and sampling.</td></tr>
+<tr><td><a href="cards/recordbench-components.html">Components</a></td><td class="st"><span class="chip shipped">as shipped</span></td><td>State pills, kind marks, chips, voices, and the parts that drifted into several (filters, boxes, rows, disclosures, labels, page titles).</td></tr>
+<tr><td><a href="cards/recordbench-pages.html">Product pages, unified</a></td><td class="st"><span class="chip proposal">proposal</span></td><td>The ten pages inside an investigation, redrawn in one shell.</td></tr>
+<tr><td><a href="cards/recordbench-gates.html">Gates, agent and edges, unified</a></td><td class="st"><span class="chip proposal">proposal</span></td><td>Bench levels, the agent pages, Connect, Allow, Founding, settings, the phone dock, the tutorial and the data model.</td></tr>
+</table>
+
+<h2>Ruled</h2>
+<p class="note">Every ruling, with its date and source, is in <code>docs/decisions.md</code> in the ragtime-design repo. In short: the family palette, the type roles and Recordbench's Iowan reading face (round 1); Recordbench shell Proposal C over A and B; and, in round 2, the single Press front page that followed Recordbench decision #250.</p>
+
+<h2>Reading the cards</h2>
+<p class="note"><b>As shipped</b> was read from source: Recordbench at <code>origin/main</code> 977a820 and its Press after the decision #250 cut, RAGtime at <code>app/src</code>, the Ledger at <code>lawfare-web/src/looks/ragtime/reader</code>. <b>Proposal</b> is unruled. <b>Ratified</b> is ruled and logged. Illustrative investigation names come only from <code>design/fixtures.json</code>; <code>task check</code> rejects any other name, because the repo is public.</p>
 </body></html>
