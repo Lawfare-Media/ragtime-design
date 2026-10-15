@@ -17,3 +17,8 @@ tasks:
     desc: Which ragtime-design version each consumer has vendored (reads GitHub, needs gh)
     cmds:
       - node scripts/status.mjs
+
+  release:
+    desc: Tag the version on main once its check passed, then open a bump PR in each consumer that is behind (-- --dry-run, -- --only Name,Name)
+    cmds:
+      - node scripts/release.mjs {{.CLI_ARGS}}

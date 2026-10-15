@@ -1,9 +1,9 @@
 {
-  "$description": "Each consumer and the package.json that depends on @lawfare/ragtime-design. `task status` reads them over the GitHub API.",
+  "$description": "Each consumer and the package.json that depends on @lawfare/ragtime-design. `task status` reads them over the GitHub API; `task release` also uses `lockDir` (where the lockfile is) and `workspace` (the npm or pnpm workspace that holds the manifest, if any).",
   "consumers": [
-    { "name": "Recordbench", "repo": "Lawfare-Media/recordbench", "manifest": "frontend/package.json" },
-    { "name": "RAGtime", "repo": "benjaminwittes/ragtime", "manifest": "app/package.json" },
-    { "name": "The Ledger", "repo": "Lawfare-Media/lawfare-web", "manifest": "package.json" },
-    { "name": "Investigations", "repo": "Lawfare-Media/ragtime-investigations", "manifest": "packages/look/package.json" }
+    { "name": "Recordbench", "repo": "Lawfare-Media/recordbench", "manifest": "frontend/package.json", "lockDir": "frontend" },
+    { "name": "RAGtime", "repo": "benjaminwittes/ragtime", "manifest": "app/package.json", "lockDir": ".", "workspace": "app" },
+    { "name": "The Ledger", "repo": "Lawfare-Media/lawfare-web", "manifest": "package.json", "lockDir": "." },
+    { "name": "Investigations", "repo": "Lawfare-Media/ragtime-investigations", "manifest": "packages/look/package.json", "lockDir": ".", "workspace": "packages/look" }
   ]
 }
