@@ -1,6 +1,6 @@
 {
   "$description": "RAGtime family design tokens. The one source of truth: edit this file, run `task build`, never edit dist/ by hand. Values are round 1 proposals (2026-10-15), see docs/decisions.md.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "color": {
     "light": {
       "accent": {

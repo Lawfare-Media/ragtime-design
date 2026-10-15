@@ -1,0 +1,9 @@
+/* @lawfare/ragtime-design v0.2.0 · generated from tokens/family.json · do not edit */
+/* Inter (SIL Open Font License 1.1, fonts/inter/OFL.txt). One variable file covers 100-900. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/InterVariable.woff2') format('woff2');
+}

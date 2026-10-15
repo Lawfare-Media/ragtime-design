@@ -1,14 +1,18 @@
 {
   "name": "@lawfare/ragtime-design",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Design tokens for the RAGtime family: RAGtime, The Ledger, Recordbench and the investigations.",
   "license": "UNLICENSED",
   "repository": "github:Lawfare-Media/ragtime-design",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     "./family.css": "./dist/family.css",
     "./family.tailwind.css": "./dist/family.tailwind.css",
+    "./family-fonts.css": "./dist/family-fonts.css",
     "./family.json": "./dist/family.json",
+    "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   }
 }
