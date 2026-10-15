@@ -69,6 +69,11 @@ two copies stay the same.
 2. Run `task build`, then commit the source and `dist/` together. `task check` is the gate, and CI
    runs it. It fails if `dist/` is not exactly what the source generates.
 3. Log the decision in `docs/decisions.md`.
-4. After the merge, tag the release on `main`: `gh release create v0.2.0`.
-5. In each consumer, bump the tag in its package.json and reinstall, as one PR per repo.
-   `task status` shows which tag each consumer is on.
+4. After the merge, run `task release`. It tags the version on `main` once that commit's `check`
+   run has passed, then opens one bump PR in each consumer that is behind, with your own `gh`
+   login. Each PR moves the pin everywhere it appears and re-resolves the lockfile. The script
+   refuses if the lockfile changes anything but this package. Try it first with
+   `task release -- --dry-run`, and limit it with `-- --only RAGtime,Recordbench`. A consumer's
+   own CI is its gate. To add a consumer, list it in `consumers.json` with its `lockDir` and
+   `workspace`.
+5. `task status` shows which tag each consumer is on, against the version on `main`.
