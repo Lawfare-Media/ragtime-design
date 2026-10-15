@@ -1,0 +1,9 @@
+{
+  "$description": "Each consumer and the package.json that depends on @lawfare/ragtime-design. `task status` reads them over the GitHub API.",
+  "consumers": [
+    { "name": "Recordbench", "repo": "Lawfare-Media/recordbench", "manifest": "frontend/package.json" },
+    { "name": "RAGtime", "repo": "benjaminwittes/ragtime", "manifest": "app/package.json" },
+    { "name": "The Ledger", "repo": "Lawfare-Media/lawfare-web", "manifest": "package.json" },
+    { "name": "Investigations", "repo": "Lawfare-Media/ragtime-investigations", "manifest": "packages/look/package.json" }
+  ]
+}

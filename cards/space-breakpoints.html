@@ -1,0 +1,91 @@
+<!-- @dsCard group="Foundations" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Space, radius, breakpoints</title>
+<style>
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#fbfaf7;--teal:#006a72}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--paper);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 20px;max-width:78ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--teal);color:var(--teal);border-radius:3px;margin-left:6px;vertical-align:2px}
+  .ruler{position:relative;height:auto;margin:6px 0 4px}
+  .track{position:relative;height:30px;border-left:1px solid var(--rule);border-right:1px solid var(--rule);background:linear-gradient(90deg,transparent 0,transparent calc(100% - 1px),var(--rule) 0)}
+  .row{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:10px;margin:2px 0}
+  .row .n{font-size:12px;color:var(--soft)}
+  .bar{position:relative;height:26px;background:#f1eee7;border-radius:3px}
+  .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink)}
+  .tick span{position:absolute;top:28px;left:-14px;font:10.5px ui-monospace,Menlo,monospace;color:var(--soft);white-space:nowrap}
+  .tick.t{background:var(--teal)}
+  .tick.t span{color:var(--teal);font-weight:600}
+  .axis{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:22px}
+  .axis .scale{display:flex;justify-content:space-between;font:10.5px ui-monospace,Menlo,monospace;color:var(--faint)}
+  .rows{margin-bottom:28px}
+  .sp{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+  .sp div{text-align:center;font:10.5px ui-monospace,Menlo,monospace;color:var(--faint)}
+  .sp i{display:block;background:var(--teal);opacity:.75;margin:0 auto 4px}
+  .rad{display:flex;gap:16px}
+  .rad div{width:150px;height:56px;border:1px solid var(--ink);display:grid;place-items:center;font:11px ui-monospace,Menlo,monospace;background:#fff}
+  table{border-collapse:collapse;font-size:12px;width:100%}
+  td,th{padding:6px 8px;border-bottom:1px solid #ece8df;text-align:left}
+  th{color:var(--soft);font-weight:600;border-bottom:1px solid var(--rule)}
+</style></head>
+<body>
+<h1>Space, radius, breakpoints <span class="tag">proposal — not ruled</span></h1>
+<p class="lede">No two products break at the same width. A phone at 390px is "phone" everywhere, but between 544px and 832px each product is in a different mode. The proposal is three named widths shared by all three, aligned with Tailwind's sm and lg so RAGtime changes the least.</p>
+
+<h2>Breakpoints today (0 – 1100px)</h2>
+<div class="rows">
+  <div class="row"><div class="n">Recordbench</div><div class="bar">
+    <div class="tick" style="left:64%"><span>44rem 704</span></div>
+    <div class="tick" style="left:78.5%"><span>54rem 864 · Press 860px</span></div>
+  </div></div>
+  <div class="row" style="margin-top:40px"><div class="n">The Ledger</div><div class="bar">
+    <div class="tick" style="left:49.5%"><span>34rem 544</span></div>
+    <div class="tick" style="left:58.2%"><span style="top:-16px">640px</span></div>
+    <div class="tick" style="left:69.8%"><span>48rem 768</span></div>
+    <div class="tick" style="left:75.6%"><span style="top:-16px">52rem 832</span></div>
+  </div></div>
+  <div class="row" style="margin-top:40px"><div class="n">RAGtime</div><div class="bar">
+    <div class="tick" style="left:58.2%"><span>sm 640</span></div>
+    <div class="tick" style="left:69.8%"><span style="top:-16px">md 768</span></div>
+    <div class="tick" style="left:81.8%"><span>900px</span></div>
+    <div class="tick" style="left:93.1%"><span style="top:-16px">lg 1024</span></div>
+  </div></div>
+  <div class="row" style="margin-top:44px"><div class="n"><b>Proposed</b></div><div class="bar" style="background:#dcebea">
+    <div class="tick t" style="left:58.2%"><span>phone | 40rem 640</span></div>
+    <div class="tick t" style="left:93.1%"><span style="left:-150px">tablet | 64rem 1024</span></div>
+  </div></div>
+  <div class="axis"><div></div><div class="scale"><span>0</span><span>275</span><span>550</span><span>825</span><span>1100px</span></div></div>
+</div>
+
+<table>
+<tr><th>Name</th><th>Range</th><th>Means</th><th>Moves from</th></tr>
+<tr><td><b>phone</b></td><td>&lt; 40rem</td><td>One column. 44px targets. Nav collapses to its phone form.</td><td>Recordbench 44rem → 40rem · Ledger 34rem → 40rem · RAGtime sm (same)</td></tr>
+<tr><td><b>tablet</b></td><td>40 – 64rem</td><td>Bar on one row, sections may scroll. No side rails.</td><td>Recordbench 54rem, Press 860px · Ledger 48/52rem · RAGtime md, 900px</td></tr>
+<tr><td><b>desktop</b></td><td>≥ 64rem</td><td>Full bar, side rails, Press masthead on one line.</td><td>RAGtime lg (same)</td></tr>
+</table>
+
+<h2>Spacing — one scale</h2>
+<div class="sp">
+  <div><i style="width:4px;height:4px"></i>1 · 4</div>
+  <div><i style="width:8px;height:8px"></i>2 · 8</div>
+  <div><i style="width:12px;height:12px"></i>3 · 12</div>
+  <div><i style="width:16px;height:16px"></i>4 · 16</div>
+  <div><i style="width:24px;height:24px"></i>5 · 24</div>
+  <div><i style="width:32px;height:32px"></i>6 · 32</div>
+  <div><i style="width:40px;height:40px"></i>7 · 40</div>
+  <div><i style="width:64px;height:64px"></i>8 · 64</div>
+</div>
+<p class="lede" style="margin-top:10px">Recordbench's --space-1..7 already is this scale (0.25 → 2.5rem). Tailwind's default 4px grid maps onto it. The Ledger moves from rem fractions (0.55, 0.6, 0.7rem) to the steps.</p>
+
+<h2>Radius and rules</h2>
+<div class="rad">
+  <div style="border-radius:0">0 · press</div>
+  <div style="border-radius:3px">3px · default</div>
+  <div style="border-radius:999px">pill · search, avatar</div>
+</div>
+<p class="lede" style="margin-top:10px">The Ledger and RAGtime are at 3px already. Recordbench's ledger look is 6px and moves to 3px. Rules are one hairline (1px, --rule). The Press double rule (4px double ink) is a display ornament, used only under a masthead.</p>
+</body></html>

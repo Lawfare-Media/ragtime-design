@@ -1,0 +1,18 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Generate dist/ from tokens/family.json
+    cmds:
+      - node scripts/build.mjs
+
+  check:
+    desc: The gate. dist/ must be exactly what the source generates.
+    cmds:
+      - node scripts/build.mjs
+      - git diff --exit-code -- dist/
+
+  status:
+    desc: Which ragtime-design version each consumer has vendored (reads GitHub, needs gh)
+    cmds:
+      - node scripts/status.mjs

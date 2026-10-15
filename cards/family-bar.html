@@ -1,0 +1,143 @@
+<!-- @dsCard group="Navigation" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family bar — one anatomy, three voices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1d2125;--soft:#4a4f55;--faint:#767a7f;--rule:#d8d4cb;--paper:#f5f3ee;--raised:#fbfaf7;--press:#e8e1cf;--teal:#006a72;--accent-soft:#dcebea;
+    --didot:Didot,'Bodoni 72','Playfair Display',serif;--schola:'TeX Gyre Schola','Century Schoolbook',Georgia,serif;--garamond:'EB Garamond',Garamond,serif}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:var(--raised);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+  h1{font-size:15px;margin:0 0 3px;font-weight:650}
+  .lede{color:var(--soft);font-size:12.5px;margin:0 0 18px;max-width:82ch}
+  h2{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:650;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--teal);color:var(--teal);border-radius:3px;margin-left:6px;vertical-align:2px}
+  /* anatomy */
+  .anat{display:grid;grid-template-columns:repeat(4,1fr);border:1px dashed var(--teal);border-radius:3px;background:#fff;font-size:12px}
+  .anat>div{padding:12px 14px;border-right:1px dashed var(--teal)}
+  .anat>div:last-child{border-right:0}
+  .anat b{display:block;font-size:12.5px}
+  .anat span{color:var(--soft)}
+  /* bars */
+  .fb{display:flex;align-items:center;gap:20px;height:52px;padding:0 20px;background:var(--chrome,var(--paper));border-bottom:1px solid var(--chrome-rule,var(--rule));font-family:Inter,sans-serif}
+  .brand{display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .brand svg{color:var(--ink)}
+  .secs{display:flex;gap:18px;font-size:14px;color:var(--soft)}
+  .secs .on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--teal);padding-bottom:15px;margin-bottom:-17px}
+  .ctx{flex:1;display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--soft)}
+  .tools{display:flex;align-items:center;gap:4px}
+  .ib{width:32px;height:32px;display:grid;place-items:center;border-radius:999px;color:var(--soft)}
+  .ib svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .av{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--raised);font:600 10px/26px Inter;text-align:center}
+  .pip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--soft);padding:0 8px}
+  .pip i{width:7px;height:7px;border-radius:50%;background:#1f6b45}
+  .w-rb{font:700 26px/1 var(--didot);letter-spacing:-.045em}
+  .w-ld{font:700 19px/1 var(--schola)}
+  .w-rt{font:600 25px/1 var(--garamond);letter-spacing:-.01em}
+  .sub{font-size:11.5px;color:var(--faint);margin:6px 0 16px}
+  .stack{display:flex;flex-direction:column;gap:0;border:1px solid #c9c4b8;border-radius:6px;overflow:hidden;width:980px}
+  .stack .pg{height:40px;background:var(--pgbg,var(--paper))}
+  /* phones */
+  .phones{display:flex;gap:22px;flex-wrap:wrap}
+  .ph{width:300px;border:8px solid #1b1d20;border-radius:36px;overflow:hidden;background:var(--chrome,var(--paper));height:520px;position:relative;font-family:Inter,sans-serif}
+  .ph .top{display:flex;align-items:center;justify-content:space-between;height:52px;padding:30px 12px 0;box-sizing:content-box;border-bottom:1px solid var(--chrome-rule,var(--rule))}
+  .ph .row2{display:flex;gap:16px;padding:0 14px;height:40px;align-items:center;font-size:13.5px;color:var(--soft);border-bottom:1px solid var(--chrome-rule,var(--rule));overflow:hidden}
+  .ph .row2 .on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--teal);padding-bottom:11px;margin-bottom:-13px}
+  .ph .content{padding:16px 14px;font-size:13px;color:var(--soft)}
+  .ph .content .l{height:9px;background:color-mix(in srgb,var(--ink) 9%,transparent);border-radius:2px;margin:9px 0}
+  .ph .dock{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--chrome-rule,var(--rule));background:var(--chrome,var(--paper));padding-bottom:16px}
+  .ph .dock div{height:48px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;color:var(--ink);border-right:1px solid var(--chrome-rule,var(--rule))}
+  .ph .dock div:last-child{border-right:0}
+  .ph .ib{width:44px;height:44px}
+  .ph .cap{position:absolute;left:0;right:0;bottom:-1px}
+  figure{margin:0}
+  figcaption{font-size:12px;color:var(--soft);margin-top:8px;max-width:300px}
+  ol.rules{font-size:12.5px;color:var(--soft);max-width:84ch;padding-left:18px}
+  ol.rules li{margin:3px 0}
+</style></head>
+<body>
+<h1>Family bar — one anatomy, three voices <span class="tag">proposal — not ruled</span></h1>
+<p class="lede">Each product keeps its wordmark face and its own sections. All three share the bar's skeleton: its height, chrome face, icon set, target sizes, paper, rule and the order of things. A reader who moves from the blog to RAGtime to a bench finds the same controls in the same places.</p>
+
+<h2>Anatomy</h2>
+<div class="anat">
+  <div><b>1 · Brand</b><span>Fluted mark + wordmark in the product's display face. Links home.</span></div>
+  <div><b>2 · Sections / context</b><span>The product's own places (Latest · Topics; Explorer; a bench's trail). A route may add controls here. Current item: 2px teal underline.</span></div>
+  <div><b>3 · Status</b><span>One quiet item: AI access pip, attendance pip. Never more than one.</span></div>
+  <div><b>4 · Tools</b><span>Search · help · scheme · account, always in that order, icons only, 32px (44px on a phone).</span></div>
+</div>
+
+<h2>Desktop — the three products on one skeleton</h2>
+<div class="stack">
+  <div class="fb">
+    <span class="brand"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="3" width="2" height="17"/><rect x="9" y="0" width="3" height="20"/><rect x="14" y="3" width="2" height="17"/><rect x="18" y="0" width="2" height="20"/></svg><span class="w-ld">The Ledger</span></span>
+    <span class="secs"><span class="on">Latest</span><span>Topics</span><span>About</span></span>
+    <span class="ctx"></span>
+    <span class="tools">
+      <span class="ib"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span>
+      <span class="ib"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+      <span class="ib"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span>
+    </span>
+  </div>
+  <div class="pg" style="--pgbg:var(--paper)"></div>
+  <div class="fb" style="--chrome:var(--raised)">
+    <span class="brand"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="0" width="2" height="20"/><rect x="10" y="0" width="2" height="20"/><rect x="15" y="0" width="2" height="20"/></svg><span class="w-rt">RAGtime</span></span>
+    <span class="secs"><span>Search</span><span class="on">Explorer</span><span>Docs</span></span>
+    <span class="ctx"><span style="border:1px solid var(--rule);border-radius:3px;padding:2px 8px">Trail</span><span style="border:1px solid var(--rule);border-radius:3px;padding:2px 8px">Conversations ▾</span></span>
+    <span class="pip"><i></i>AI access</span>
+    <span class="tools">
+      <span class="ib"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="ib"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span>
+      <span class="av">TK</span>
+    </span>
+  </div>
+  <div class="pg" style="--pgbg:var(--raised)"></div>
+  <div class="fb" style="--chrome:var(--press);--chrome-rule:transparent">
+    <span class="brand"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="3" width="2" height="17"/><rect x="9" y="0" width="3" height="20"/><rect x="14" y="3" width="2" height="17"/><rect x="18" y="0" width="2" height="20"/></svg><span class="w-rb">recordbench</span></span>
+    <span class="secs" style="color:#4b4639"><span>Bench</span><span style="color:#7d7665">›</span><span class="on">Agency rule changes</span></span>
+    <span class="ctx"></span>
+    <span class="pip" style="color:#4b4639"><i></i>claude-code</span>
+    <span class="tools">
+      <span class="ib" style="color:#4b4639"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span>
+      <span class="ib" style="color:#4b4639"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></span>
+      <span class="av" style="background:#15130f">TK</span>
+    </span>
+  </div>
+  <div class="pg" style="--pgbg:var(--press);border-top:4px double #15130f"></div>
+</div>
+<p class="sub">The chrome paints whatever paper the page is on (--chrome-paper). Recordbench's crumb trail moves into slot 2, so the bar and the trail become one row on desktop.</p>
+
+<h2>Phone — one rule: brand and tools on top, places on the bottom</h2>
+<div class="phones">
+<figure><div class="ph">
+  <div class="top"><span class="brand"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="0" width="2" height="20"/><rect x="5" y="3" width="2" height="17"/><rect x="9" y="0" width="3" height="20"/><rect x="14" y="3" width="2" height="17"/><rect x="18" y="0" width="2" height="20"/></svg><span class="w-ld" style="font-size:17px">The Ledger</span></span><span class="tools"><span class="ib"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></span><span class="ib"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span></span></div>
+  <div class="row2"><span class="on">Latest</span><span>Topics</span><span>About</span></div>
+  <div class="content"><div class="l" style="width:80%"></div><div class="l"></div><div class="l" style="width:92%"></div><div class="l" style="width:60%"></div></div>
+</div><figcaption><b>Ledger:</b> nearly today's layout. Targets grow to 44px, and Reader/Desktop moves into the scheme menu.</figcaption></figure>
+
+<figure><div class="ph" style="--chrome:var(--raised)">
+  <div class="top"><span class="brand"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="0" width="2" height="16"/><rect x="5" y="0" width="2" height="16"/><rect x="9" y="0" width="2" height="16"/><rect x="13" y="0" width="2" height="16"/></svg><span class="w-rt" style="font-size:21px">RAGtime</span></span><span class="tools"><span class="pip" style="padding:0 2px"><i></i></span><span class="ib"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="av">TK</span></span></div>
+  <div class="row2"><span>Search</span><span class="on">Explorer</span><span style="margin-left:auto;border:1px solid var(--rule);border-radius:3px;padding:1px 7px;font-size:12px">Conversations ▾</span></div>
+  <div class="content"><div class="l" style="width:70%"></div><div class="l"></div><div class="l" style="width:85%"></div></div>
+</div><figcaption><b>RAGtime:</b> the route slot gets its own row, so the top row never reflows. Docs moves into the account menu.</figcaption></figure>
+
+<figure><div class="ph" style="--chrome:var(--press);--chrome-rule:#15130f30">
+  <div class="top" style="border-bottom:0"><span class="brand"><span class="w-rb" style="font-size:24px">recordbench</span></span><span class="tools"><span class="pip" style="padding:0 6px;color:#4b4639"><i></i></span><span class="av" style="background:#15130f">TK</span></span></div>
+  <div style="border-bottom:4px double #15130f;margin:0 0 0"></div>
+  <div class="content"><div class="l" style="width:76%"></div><div class="l"></div><div class="l" style="width:90%"></div><div class="l" style="width:64%"></div></div>
+  <div class="dock"><div>‹ Back</div><div>⌕ Find</div><div>⚙ Settings</div></div>
+</div><figcaption><b>Recordbench:</b> places sit at the bottom (the dock), because the bench is used one-handed in the record. This is the one sanctioned exception to "places on the bottom row of the bar". Proposal A from the Recordbench card.</figcaption></figure>
+</div>
+
+<h2>Rules the bar keeps</h2>
+<ol class="rules">
+  <li>The chrome never paints a colour the page does not use. It reads <code>--chrome-paper</code>, which defaults to <code>--paper</code>.</li>
+  <li>The chrome is set in Inter. Only the wordmark uses the product face.</li>
+  <li>Height is 52px. A phone adds the safe-area inset and at most one more row.</li>
+  <li>Icon targets are 32px on desktop and 44px on a phone. Icons share one stroke (1.5).</li>
+  <li>Tools always come in this order: search, help/feedback, scheme, account. A tool a product lacks leaves no gap.</li>
+  <li>Teal marks the current place and focus only. Wordmarks and icons are ink.</li>
+</ol>
+</body></html>
