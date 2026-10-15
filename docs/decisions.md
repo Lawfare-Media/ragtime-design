@@ -3,6 +3,10 @@
 Newest first. A decision made in a Claude Design chat or a meeting is recorded here, because those
 are not kept.
 
+## 2026-10-15 — v0.2.1
+
+Inter italic now ships beside the upright, so sans italics stop rendering as a slanted imitation of the upright face. The licence path in `family-fonts.css` is also corrected. No token values change.
+
 ## 2026-10-15 — round 1 rulings (ratified by Thomas in Claude Design), v0.2.0
 
 Source: `design/index.html`, `design/cards/type.html` and `design/cards/colour.html`, pulled the same
