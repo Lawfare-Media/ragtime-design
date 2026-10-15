@@ -94,21 +94,26 @@ const header = (c) => `${c} @lawfare/ragtime-design v${src.version} · generated
 // product shares (ruled 2026-10-15). A product that wants it imports family-fonts.css; the
 // woff2 sits beside it under dist/fonts/, so the relative url resolves from the package.
 function fonts() {
-  return [
-    '/* Inter (SIL Open Font License 1.1, fonts/inter/OFL.txt). One variable file covers 100-900. */',
+  const face = (style, file) => [
     '@font-face {',
     "  font-family: 'Inter';",
-    '  font-style: normal;',
+    `  font-style: ${style};`,
     '  font-weight: 100 900;',
     '  font-display: swap;',
-    "  src: url('./fonts/InterVariable.woff2') format('woff2');",
+    `  src: url('./fonts/${file}') format('woff2');`,
     '}',
+  ];
+  return [
+    '/* Inter (SIL Open Font License 1.1, ./fonts/Inter-OFL.txt). One variable file per style covers 100-900. */',
+    ...face('normal', 'InterVariable.woff2'),
+    ...face('italic', 'InterVariable-Italic.woff2'),
     '',
   ].join('\n');
 }
 
 mkdirSync(join(out, 'fonts'), { recursive: true });
 copyFileSync(join(root, 'fonts/inter/InterVariable.woff2'), join(out, 'fonts/InterVariable.woff2'));
+copyFileSync(join(root, 'fonts/inter/InterVariable-Italic.woff2'), join(out, 'fonts/InterVariable-Italic.woff2'));
 copyFileSync(join(root, 'fonts/inter/OFL.txt'), join(out, 'fonts/Inter-OFL.txt'));
 
 const files = {
